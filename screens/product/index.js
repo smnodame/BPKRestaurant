@@ -5,22 +5,24 @@
  */
 
 import React, { Component } from 'react';
-import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Image, ScrollView } from 'react-native';
 import GridView from 'react-native-super-grid';
-import { Container, Header, Content, Card, CardItem, Text, Body, Left, Button, Icon, Title, Right } from 'native-base';
-import {BottomSheetBehavior} from 'react-native-bottom-sheet-behavior';
+import { Container, Header, Content, Card, CardItem, Text, Body, Left, Button, Label, Icon, Title, Right, Item, Switch, Input, List, ListItem, Separator  } from 'native-base';
+import PopupDialog, {
+  DialogTitle,
+  DialogButton,
+  SlideAnimation,
+  ScaleAnimation,
+  FadeAnimation,
+} from 'react-native-popup-dialog';
+import { Dialog, ConfirmDialog } from 'react-native-simple-dialogs';
 
 export default class Product extends Component<{}> {
     constructor(props) {
         super(props)
         this.state = {
-            modalVisible: false,
+            dialogVisible: false,
         }
-        this.setModalVisible = this.logousetModalVisiblet.bind(this)
-    }
-    
-    setModalVisible(visible) {
-        this.setState({modalVisible: visible});
     }
 
     render() {
@@ -114,6 +116,35 @@ export default class Product extends Component<{}> {
                     </Right>
                 </Header>
                 <Content>
+                    <Button
+                        onPress={() => {
+                            this.setState({dialogVisible: true})
+                        }}
+                    >
+                        <Text>Puppies</Text>
+                    </Button>
+                    <ConfirmDialog
+                        visible={this.state.dialogVisible}
+                        title="Custom Dialog"
+                        positiveButton={{
+                            title: "OK",
+                            onPress: () => alert("Ok touched!")
+                        }}
+                        onTouchOutside={() => this.setState({dialogVisible: false})} >
+                        <View>
+                            <View>
+                                <Item floatingLabel>
+                                    <Label>Note</Label>
+                                    <Input />
+                                </Item>
+                            </View>
+                            <View>
+                                <Text>
+                                ราคา 20 บาท
+                                </Text>
+                            </View>
+                        </View>
+                    </ConfirmDialog>
                     <GridView
                         itemWidth={130}
                         items={items}
@@ -132,18 +163,6 @@ export default class Product extends Component<{}> {
                             </TouchableOpacity>
                         )}
                     />
-                    <BottomSheetBehavior
-                        ref='bottomSheet'
-                        peekHeight={70}
-                        hideable={false}
-                        state={BottomSheetBehavior.STATE_COLLAPSED}>
-                            <View style={{backgroundColor: '#4389f2'}}>
-                                <View style={{padding: 26}}>
-                                    <Text>BottomSheetBehavior!</Text>
-                                </View>
-                                <View style={{height: 200, backgroundColor: '#fff'}} />
-                            </View>
-                    </BottomSheetBehavior>
                 </Content>
             </Container>
         );
@@ -171,4 +190,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#fff',
   },
+  dialogContentView: {
+    flex: 1
+  },
+  textInput: {
+		height: 50,
+		borderRadius: 3,
+		borderWidth: 1,
+		borderColor: '#d3d3d3',
+		paddingHorizontal: 19,
+		paddingLeft: 10, paddingRight: 10
+	},
 });
