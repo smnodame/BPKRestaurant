@@ -30,7 +30,7 @@ export default class Restaurant extends Component<{}> {
                         onPress={() => this.props.navigation.navigate("Table")}
                     >
                         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 15, paddingRight: 15 }}>
-                            <Icon style={{color: '#4c4c4c'}} name='ios-person-outline' />
+                            <Icon style={{color: '#4c4c4c'}} name='restaurant' />
                             <Text style={{color: '#4c4c4c' }}>WS001 - ศูนย์อาหาร 1 </Text>
                             <Icon style={{color: '#4c4c4c'}} name='ios-arrow-forward-outline' />
                         </View>
@@ -40,7 +40,7 @@ export default class Restaurant extends Component<{}> {
                         onPress={() => this.props.navigation.navigate("Table")}
                     >
                         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 15, paddingRight: 15 }}>
-                            <Icon style={{color: '#4c4c4c'}} name='ios-person-outline' />
+                            <Icon style={{color: '#4c4c4c'}} name='restaurant' />
                             <Text style={{color: '#4c4c4c' }}>WS002 - ศูนย์อาหาร 2 </Text>
                             <Icon style={{color: '#4c4c4c'}} name='ios-arrow-forward-outline' />
                         </View>
