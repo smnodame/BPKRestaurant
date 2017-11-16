@@ -13,11 +13,13 @@ import { StackNavigator } from 'react-navigation'
 import Product from './screens/product'
 import Restaurant from './screens/restaurant'
 import Table from './screens/table'
+import Bill from './screens/bill'
 
 const BPKRestaurant = StackNavigator({
     Product: { screen: Product },
     Restaurant: { screen: Restaurant },
-    Table: { screen: Table }
+    Table: { screen: Table },
+    Bill: { screen: Bill }
 },
 {
     initialRouteName: "Restaurant",

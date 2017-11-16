@@ -5,7 +5,7 @@
  */
 
 import React, { Component } from 'react';
-import { StyleSheet, View, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native';
 import GridView from 'react-native-super-grid';
 import { Container, Header, Content, Card, CardItem, Root, ActionSheet, Text, Body, Left, Button, Label, Icon, Title, Right, Item, Switch, Input, List, ListItem, Separator  } from 'native-base';
 import PopupDialog, {
@@ -17,7 +17,7 @@ import PopupDialog, {
 } from 'react-native-popup-dialog';
 import Modal from 'react-native-modal';
 import { Dialog, ConfirmDialog } from 'react-native-simple-dialogs';
-
+var {height, width} = Dimensions.get('window');
 var BUTTONS = [
   { text: "All", icon: "md-arrow-dropright", iconColor: "#ea943b"},
   { text: "ข้าว", icon: "md-arrow-dropright", iconColor: "#ea943b"},
@@ -33,9 +33,98 @@ export default class Product extends Component<{}> {
         super(props)
         this.state = {
             dialogVisible: false,
+            billModal: false
         }
         this.renderModalContent = this.renderModalContent.bind(this)
+        this.renderBillModal = this.renderBillModal.bind(this)
     }
+
+    renderBillModal = () => (
+        <View style={styles.modalContent}>
+            <View style={{ flexDirection: 'row', marginBottom: 10 }}>
+                <Text style={{ fontSize: 20 }}>
+                    รายการที่สั่ง
+                </Text>
+                <View style={{ flex: 1 }} />
+                <Button transparent
+                style={{ paddingBottom: 20 }}
+                onPress={() => this.setState({ billModal: false })}>
+                    <Icon name='md-close' />
+                </Button>
+            </View>
+            <View style={{ width: '100%' }}>
+                <ScrollView style={{ height: height*.5 }}>
+                <List>
+                    <ListItem style={{ marginLeft: 0 }}>
+                        <Body>
+                            <Text>กุ้งมะนาว เปรี้ยวแซ่บ</Text>
+                            <Text note>x 4 จาน</Text>
+                        </Body>
+                        <Right>
+                            <Text style={{ fontSize: 18, color: '#5cb85c' }}>
+                                50 ฿
+                            </Text>
+                        </Right>
+                    </ListItem>
+                    <ListItem style={{ marginLeft: 0 }}>
+                        <Body>
+                            <Text>ทอดมันปลากราย </Text>
+                            <Text note>x 9 ชิ้น</Text>
+                        </Body>
+                        <Right>
+                            <Text style={{ fontSize: 18, color: '#5cb85c' }}>
+                                150 ฿
+                            </Text>
+                        </Right>
+                    </ListItem>
+                    <ListItem style={{ marginLeft: 0 }}>
+                        <Body>
+                            <Text>ทอดมันข้าวโพดกุ้งสับ</Text>
+                            <Text note>x 1 จาน</Text>
+                        </Body>
+                        <Right>
+                            <Text style={{ fontSize: 18, color: '#5cb85c' }}>
+                                120 ฿
+                            </Text>
+                        </Right>
+                    </ListItem>
+                    <ListItem style={{ marginLeft: 0 }}>
+                        <Body>
+                            <Text>เต้าหู้ทรงเครื่อง</Text>
+                            <Text note>x 3 ชุด</Text>
+                        </Body>
+                        <Right>
+                            <Text style={{ fontSize: 18, color: '#5cb85c' }}>
+                                875 ฿
+                            </Text>
+                        </Right>
+                    </ListItem>
+                    <ListItem style={{ marginLeft: 0 }}>
+                        <Body>
+                            <Text>น้ำเเปปซี่</Text>
+                            <Text note>x 1 ขวด</Text>
+                        </Body>
+                        <Right>
+                            <Text style={{ fontSize: 18, color: '#5cb85c' }}>
+                                25 ฿
+                            </Text>
+                        </Right>
+                    </ListItem>
+                </List>
+                </ScrollView>
+            </View>
+            <View style={{ flexDirection: 'row', marginTop: 20 }}>
+                <Button iconLeft success style={{ marginRight: 20 }}>
+                    <Icon name='md-print' />
+                    <Text>พิมพ์ใบสั่ง</Text>
+                </Button>
+                <Button success>
+                    <Icon name='md-card' />
+                    <Text>ชำระเงิน</Text>
+                </Button>
+            </View>
+        </View>
+    )
 
     renderModalContent = () => (
         <View style={styles.modalContent}>
@@ -184,36 +273,35 @@ export default class Product extends Component<{}> {
                         </Text>
                     </Body>
                     <Right>
-                        <Button transparent >
+                        <Button transparent onPress={() => this.setState({ billModal: true })}>
                             <Icon name="md-clipboard" />
                         </Button>
                     </Right>
                 </Header>
                 <Content>
-                    <View style={{ flexDirection: 'row', paddingTop: 15, paddingRight: 15 }}>
-                        <Text style={{ color: '#b2b0b0', fontSize: 25, paddingLeft: 20, paddingTop: 5 }}>
-                            เมนู
-                        </Text>
-                        <View style={{ flex: 1 }}/>
-                        <Button iconRight style={{ backgroundColor: '#3b5998' }}
-                            onPress={() =>
-                                ActionSheet.show(
-                                {
-                                    options: BUTTONS,
-                                    cancelButtonIndex: CANCEL_INDEX,
-                                    destructiveButtonIndex: DESTRUCTIVE_INDEX,
-                                    title: "เลือกประเภทสินค้า (Category)"
-                                },
-                                buttonIndex => {
-                                    this.setState({ clicked: BUTTONS[buttonIndex] });
-                                }
-                        )}>
-                            <Text style={{ color: 'white' }}>
-                                All
-                            </Text>
-                            <Icon name="md-arrow-dropdown" />
-                        </Button>
-                    </View>
+                    <Header style={{ backgroundColor: '#3b5998' }}>
+                        <Right>
+                            <Button iconRight transparent
+                                onPress={() =>
+                                    ActionSheet.show(
+                                    {
+                                        options: BUTTONS,
+                                        cancelButtonIndex: CANCEL_INDEX,
+                                        destructiveButtonIndex: DESTRUCTIVE_INDEX,
+                                        title: "เลือกประเภทสินค้า (Category)"
+                                    },
+                                    buttonIndex => {
+                                        this.setState({ clicked: BUTTONS[buttonIndex] });
+                                    }
+                            )}>
+                                <Text style={{ color: 'white' }}>
+                                    All
+                                </Text>
+                                <Icon name="md-arrow-dropdown" />
+                            </Button>
+                        </Right>
+                    </Header>
+                    <Modal isVisible={this.state.billModal}>{this.renderBillModal()}</Modal>
                     <Modal isVisible={this.state.dialogVisible}
                     onBackdropPress={() => this.setState({dialogVisible: false})}
                     style={{
