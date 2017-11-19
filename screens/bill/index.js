@@ -100,8 +100,7 @@ export default class Bill extends Component<{}> {
                             <Text>ราคารวม</Text>
                         </Body>
                         <Right style={{ flex: 1, flexDirection: 'row' }}>
-                             <Input />
-                             <Icon name="arrow-forward" />
+                             <Input style={{ textAlign: 'right'}} placeholder="0 ฿" placeholderTextColor='#d4d8da'/>
                         </Right>
                     </ListItem>
                     <ListItem icon style={{ marginLeft: 0, paddingLeft: 20 }}>
@@ -109,8 +108,7 @@ export default class Bill extends Component<{}> {
                             <Text>ส่วนลด</Text>
                         </Body>
                         <Right style={{ flex: 1, flexDirection: 'row' }}>
-                              <Input />
-                             <Icon name="arrow-forward" />
+                              <Input style={{ textAlign: 'right'}} placeholder="0 ฿" placeholderTextColor='#d4d8da'/>
                         </Right>
                     </ListItem>
                     <ListItem icon style={{ marginLeft: 0, paddingLeft: 20 }}>
@@ -126,8 +124,7 @@ export default class Bill extends Component<{}> {
                             <Text>ชำระ</Text>
                         </Body>
                         <Right style={{ flex: 1, flexDirection: 'row' }}>
-                              <Input style={{ borderBottomWidth: 1}}/>
-                             <Icon name="arrow-forward" />
+                             <Input style={{ textAlign: 'right'}} placeholder="0 ฿" placeholderTextColor='#d4d8da'/>
                         </Right>
                     </ListItem>
                     <ListItem icon style={{ marginLeft: 0, paddingLeft: 20 }}>
