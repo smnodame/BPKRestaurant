@@ -4,44 +4,103 @@
  * @flow
  */
 
+// return (
+//     <View style={styles.modalContent}>
+//         <View style={{ flexDirection: 'row', marginBottom: 10 }}>
+//             <Text style={{ fontSize: 20 }}>
+//                 ชำระเงิน
+//             </Text>
+//             <View style={{ flex: 1 }} />
+//             <Button transparent
+//             style={{ paddingBottom: 20 }}
+//             onPress={() => this.setState({ billModal: false, billContent: 'bill' })}>
+//                 <Icon name='md-close' />
+//             </Button>
+//         </View>
+//         <View style={{ width: '100%' }}>
+//             <ScrollView style={{ height: height*.5 }}>
+//
+//             </ScrollView>
+//         </View>
+//     </View>
+// )
 import React, { Component } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import GridView from 'react-native-super-grid';
-import { Container, Header, Content, Card, CardItem, Text, Body, Left, Button, Icon, Title } from 'native-base';
+import { Container, Header, Content, Card, CardItem, Text, Body, Left, Button, Icon, Title, List, ListItem, Item, Input, Right, Form, Label } from 'native-base';
 
 export default class Bill extends Component<{}> {
     render() {
       return (
-        <Container>
-        <Header style={{ backgroundColor: '#3b5998' }}>
-            <Left>
-                <Button transparent>
-                    <Icon name="md-menu" />
-                </Button>
-            </Left>
-            <Body>
-                <Title>รายการที่สั่ง</Title>
-            </Body>
-        </Header>
+        <Container style={{ backgroundColor: '#fff' }}>
+            <Header style={{ backgroundColor: '#3b5998' }}>
+                <Left>
+                    <Button transparent>
+                        <Icon name="md-arrow-round-back" />
+                    </Button>
+                </Left>
+                <Body>
+                    <Title>ชำระเงิน</Title>
+                </Body>
+                <Right>
+                    <Button transparent>
+                        <Icon name="md-checkmark" />
+                    </Button>
+                </Right>
+            </Header>
             <Content>
                 <List>
-                    <ListItem>
+                    <ListItem icon style={{ marginLeft: 0, paddingLeft: 20 }}>
                         <Body>
-                            <Text>Sankhadeep</Text>
-                            <Text note>Its time to build a difference . .</Text>
+                            <Text>ประเภทการชำระ</Text>
                         </Body>
+                        <Right style={{ flex: 1, flexDirection: 'row' }}>
+                             <Text note>เงินสด</Text>
+                             <Icon name="md-arrow-dropdown" />
+                        </Right>
                     </ListItem>
-                    <ListItem>
+                    <ListItem icon style={{ marginLeft: 0, paddingLeft: 20 }}>
                         <Body>
-                            <Text>Sankhadeep</Text>
-                            <Text note>Its time to build a difference . .</Text>
+                            <Text>ราคารวม</Text>
                         </Body>
+                        <Right style={{ flex: 1, flexDirection: 'row' }}>
+                             <Text note></Text>
+                             <Icon name="arrow-forward" />
+                        </Right>
                     </ListItem>
-                    <ListItem>
+                    <ListItem icon style={{ marginLeft: 0, paddingLeft: 20 }}>
                         <Body>
-                            <Text>Sankhadeep</Text>
-                            <Text note>Its time to build a difference . .</Text>
+                            <Text>ส่วนลด</Text>
                         </Body>
+                        <Right style={{ flex: 1, flexDirection: 'row' }}>
+                             <Text note></Text>
+                             <Icon name="arrow-forward" />
+                        </Right>
+                    </ListItem>
+                    <ListItem icon style={{ marginLeft: 0, paddingLeft: 20 }}>
+                        <Body>
+                            <Text>ราคาสุทธิ</Text>
+                        </Body>
+                        <Right style={{ flex: 1, flexDirection: 'row' }}>
+                             <Text note></Text>
+                        </Right>
+                    </ListItem>
+                    <ListItem icon style={{ marginLeft: 0, paddingLeft: 20 }}>
+                        <Body>
+                            <Text>ชำระ</Text>
+                        </Body>
+                        <Right style={{ flex: 1, flexDirection: 'row' }}>
+                             <Text note></Text>
+                             <Icon name="arrow-forward" />
+                        </Right>
+                    </ListItem>
+                    <ListItem icon style={{ marginLeft: 0, paddingLeft: 20 }}>
+                        <Body>
+                            <Text>ทอน</Text>
+                        </Body>
+                        <Right style={{ flex: 1, flexDirection: 'row' }}>
+                             <Text note></Text>
+                        </Right>
                     </ListItem>
                 </List>
             </Content>
