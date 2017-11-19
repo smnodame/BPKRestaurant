@@ -14,15 +14,17 @@ import Product from './screens/product'
 import Restaurant from './screens/restaurant'
 import Table from './screens/table'
 import Bill from './screens/bill'
+import Login from './screens/login'
 
 const BPKRestaurant = StackNavigator({
     Product: { screen: Product },
     Restaurant: { screen: Restaurant },
     Table: { screen: Table },
-    Bill: { screen: Bill }
+    Bill: { screen: Bill },
+    Login: { screen: Login }
 },
 {
-    initialRouteName: "Restaurant",
+    initialRouteName: "Login",
     headerMode: "none",
 })
 
