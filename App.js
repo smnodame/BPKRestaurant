@@ -15,16 +15,18 @@ import Restaurant from './screens/restaurant'
 import Table from './screens/table'
 import Bill from './screens/bill'
 import Login from './screens/login'
+import Splash from './screens/splash'
 
 const BPKRestaurant = StackNavigator({
     Product: { screen: Product },
     Restaurant: { screen: Restaurant },
     Table: { screen: Table },
     Bill: { screen: Bill },
-    Login: { screen: Login }
+    Login: { screen: Login },
+    Splash: { screen: Splash }
 },
 {
-    initialRouteName: "Login",
+    initialRouteName: "Splash",
     headerMode: "none",
 })
 

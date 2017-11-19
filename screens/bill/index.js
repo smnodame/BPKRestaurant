@@ -4,26 +4,6 @@
  * @flow
  */
 
-// return (
-//     <View style={styles.modalContent}>
-//         <View style={{ flexDirection: 'row', marginBottom: 10 }}>
-//             <Text style={{ fontSize: 20 }}>
-//                 ชำระเงิน
-//             </Text>
-//             <View style={{ flex: 1 }} />
-//             <Button transparent
-//             style={{ paddingBottom: 20 }}
-//             onPress={() => this.setState({ billModal: false, billContent: 'bill' })}>
-//                 <Icon name='md-close' />
-//             </Button>
-//         </View>
-//         <View style={{ width: '100%' }}>
-//             <ScrollView style={{ height: height*.5 }}>
-//
-//             </ScrollView>
-//         </View>
-//     </View>
-// )
 import React, { Component } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import GridView from 'react-native-super-grid';
