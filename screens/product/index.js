@@ -17,6 +17,7 @@ import PopupDialog, {
 } from 'react-native-popup-dialog';
 import Modal from 'react-native-modal';
 import { Dialog, ConfirmDialog } from 'react-native-simple-dialogs';
+
 var {height, width} = Dimensions.get('window');
 var BUTTONS = [
   { text: "All", icon: "md-arrow-dropright", iconColor: "#ea943b"},
@@ -33,11 +34,22 @@ export default class Product extends Component<{}> {
         super(props)
         this.state = {
             dialogVisible: false,
-            billModal: false
+            billModal: false,
+            billHeight: height*.5
         }
         this.renderModalContent = this.renderModalContent.bind(this)
         this.renderBillModal = this.renderBillModal.bind(this)
         this.showCategoty = this.showCategoty.bind(this)
+        // Event Listener for orientation changes
+        Dimensions.addEventListener('change', () => {
+            const {height, width} = Dimensions.get('window')
+            if(height > width) {
+                this.setState({ billHeight: height*.5 })
+            } else {
+                this.setState({ billHeight: height*.3 })
+            }
+
+        })
     }
 
     showCategoty = () => {
@@ -71,7 +83,7 @@ export default class Product extends Component<{}> {
                     </Button>
                 </View>
                 <View style={{ width: '100%' }}>
-                    <ScrollView style={{ height: height*.5 }}>
+                    <ScrollView style={{ height: this.state.billHeight }}>
                     <List>
                         <ListItem style={{ marginLeft: 0 }}>
                             <Body>
@@ -202,6 +214,15 @@ export default class Product extends Component<{}> {
             </Button>
         </View>
     )
+
+    componentDidMount() {
+
+    }
+
+    componentWillUnmount() {
+
+    }
+
 
     render() {
         const items = [
