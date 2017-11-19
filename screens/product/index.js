@@ -33,98 +33,231 @@ export default class Product extends Component<{}> {
         super(props)
         this.state = {
             dialogVisible: false,
-            billModal: false
+            billModal: false,
+            billContent: 'bill'
         }
         this.renderModalContent = this.renderModalContent.bind(this)
         this.renderBillModal = this.renderBillModal.bind(this)
+        this.showCategoty = this.showCategoty.bind(this)
     }
 
-    renderBillModal = () => (
-        <View style={styles.modalContent}>
-            <View style={{ flexDirection: 'row', marginBottom: 10 }}>
-                <Text style={{ fontSize: 20 }}>
-                    รายการที่สั่ง
-                </Text>
-                <View style={{ flex: 1 }} />
-                <Button transparent
-                style={{ paddingBottom: 20 }}
-                onPress={() => this.setState({ billModal: false })}>
-                    <Icon name='md-close' />
-                </Button>
-            </View>
-            <View style={{ width: '100%' }}>
-                <ScrollView style={{ height: height*.5 }}>
-                <List>
-                    <ListItem style={{ marginLeft: 0 }}>
-                        <Body>
-                            <Text>กุ้งมะนาว เปรี้ยวแซ่บ</Text>
-                            <Text note>x 4 จาน</Text>
-                        </Body>
-                        <Right>
-                            <Text style={{ fontSize: 18, color: '#5cb85c' }}>
-                                50 ฿
-                            </Text>
-                        </Right>
-                    </ListItem>
-                    <ListItem style={{ marginLeft: 0 }}>
-                        <Body>
-                            <Text>ทอดมันปลากราย </Text>
-                            <Text note>x 9 ชิ้น</Text>
-                        </Body>
-                        <Right>
-                            <Text style={{ fontSize: 18, color: '#5cb85c' }}>
-                                150 ฿
-                            </Text>
-                        </Right>
-                    </ListItem>
-                    <ListItem style={{ marginLeft: 0 }}>
-                        <Body>
-                            <Text>ทอดมันข้าวโพดกุ้งสับ</Text>
-                            <Text note>x 1 จาน</Text>
-                        </Body>
-                        <Right>
-                            <Text style={{ fontSize: 18, color: '#5cb85c' }}>
-                                120 ฿
-                            </Text>
-                        </Right>
-                    </ListItem>
-                    <ListItem style={{ marginLeft: 0 }}>
-                        <Body>
-                            <Text>เต้าหู้ทรงเครื่อง</Text>
-                            <Text note>x 3 ชุด</Text>
-                        </Body>
-                        <Right>
-                            <Text style={{ fontSize: 18, color: '#5cb85c' }}>
-                                875 ฿
-                            </Text>
-                        </Right>
-                    </ListItem>
-                    <ListItem style={{ marginLeft: 0 }}>
-                        <Body>
-                            <Text>น้ำเเปปซี่</Text>
-                            <Text note>x 1 ขวด</Text>
-                        </Body>
-                        <Right>
-                            <Text style={{ fontSize: 18, color: '#5cb85c' }}>
-                                25 ฿
-                            </Text>
-                        </Right>
-                    </ListItem>
-                </List>
-                </ScrollView>
-            </View>
-            <View style={{ flexDirection: 'row', marginTop: 20 }}>
-                <Button iconLeft success style={{ marginRight: 20 }}>
-                    <Icon name='md-print' />
-                    <Text>พิมพ์ใบสั่ง</Text>
-                </Button>
-                <Button success>
-                    <Icon name='md-card' />
-                    <Text>ชำระเงิน</Text>
-                </Button>
-            </View>
-        </View>
-    )
+    showCategoty = () => {
+        if ( this.actionSheet !== null ) {
+            this.actionSheet._root.showActionSheet(
+                {
+                    options: BUTTONS,
+                    cancelButtonIndex: CANCEL_INDEX,
+                    destructiveButtonIndex: DESTRUCTIVE_INDEX,
+                    title: "เลือกประเภทสินค้า (Category)"
+                },
+                buttonIndex => {
+                    this.setState({ clicked: BUTTONS[buttonIndex] });
+                }
+            )
+        }
+        // ActionSheet.show(
+        //     {
+        //         options: BUTTONS,
+        //         cancelButtonIndex: CANCEL_INDEX,
+        //         destructiveButtonIndex: DESTRUCTIVE_INDEX,
+        //         title: "เลือกประเภทสินค้า (Category)"
+        //     },
+        //     buttonIndex => {
+        //         this.setState({ clicked: BUTTONS[buttonIndex] });
+        //     }
+        // )
+    }
+
+    renderBillModal = () => {
+        if(this.state.billContent == 'bill') {
+            return (
+                <View style={styles.modalContent}>
+                    <View style={{ flexDirection: 'row', marginBottom: 10 }}>
+                        <Text style={{ fontSize: 20 }}>
+                            รายการที่สั่ง
+                        </Text>
+                        <View style={{ flex: 1 }} />
+                        <Button transparent
+                        style={{ paddingBottom: 20 }}
+                        onPress={() => this.setState({ billModal: false })}>
+                            <Icon name='md-close' />
+                        </Button>
+                    </View>
+                    <View style={{ width: '100%' }}>
+                        <ScrollView style={{ height: height*.5 }}>
+                        <List>
+                            <ListItem style={{ marginLeft: 0 }}>
+                                <Body>
+                                    <Text>กุ้งมะนาว เปรี้ยวแซ่บ</Text>
+                                    <Text note>x 4 จาน</Text>
+                                </Body>
+                                <Right>
+                                    <Text style={{ fontSize: 18, color: '#5cb85c' }}>
+                                        50 ฿
+                                    </Text>
+                                </Right>
+                            </ListItem>
+                            <ListItem style={{ marginLeft: 0 }}>
+                                <Body>
+                                    <Text>ทอดมันปลากราย </Text>
+                                    <Text note>x 9 ชิ้น</Text>
+                                </Body>
+                                <Right>
+                                    <Text style={{ fontSize: 18, color: '#5cb85c' }}>
+                                        150 ฿
+                                    </Text>
+                                </Right>
+                            </ListItem>
+                            <ListItem style={{ marginLeft: 0 }}>
+                                <Body>
+                                    <Text>ทอดมันข้าวโพดกุ้งสับ</Text>
+                                    <Text note>x 1 จาน</Text>
+                                </Body>
+                                <Right>
+                                    <Text style={{ fontSize: 18, color: '#5cb85c' }}>
+                                        120 ฿
+                                    </Text>
+                                </Right>
+                            </ListItem>
+                            <ListItem style={{ marginLeft: 0 }}>
+                                <Body>
+                                    <Text>เต้าหู้ทรงเครื่อง</Text>
+                                    <Text note>x 3 ชุด</Text>
+                                </Body>
+                                <Right>
+                                    <Text style={{ fontSize: 18, color: '#5cb85c' }}>
+                                        875 ฿
+                                    </Text>
+                                </Right>
+                            </ListItem>
+                            <ListItem style={{ marginLeft: 0 }}>
+                                <Body>
+                                    <Text>น้ำเเปปซี่</Text>
+                                    <Text note>x 1 ขวด</Text>
+                                </Body>
+                                <Right>
+                                    <Text style={{ fontSize: 18, color: '#5cb85c' }}>
+                                        25 ฿
+                                    </Text>
+                                </Right>
+                            </ListItem>
+                        </List>
+                        </ScrollView>
+                    </View>
+                    <View style={{ flexDirection: 'row', marginTop: 20 }}>
+                        <Button iconLeft success style={{ marginRight: 20 }}>
+                            <Icon name='md-print' />
+                            <Text>พิมพ์ใบสั่ง</Text>
+                        </Button>
+                        <Button success onPress={() => this.setState({ billContent: 'payMoney' })}>
+                            <Icon name='md-card' />
+                            <Text>ชำระเงิน</Text>
+                        </Button>
+                    </View>
+                </View>
+            )
+        } else {
+            return (
+                <View style={styles.modalContent}>
+                    <View style={{ flexDirection: 'row', marginBottom: 10 }}>
+                        <Text style={{ fontSize: 20 }}>
+                            ชำระเงิน
+                        </Text>
+                        <View style={{ flex: 1 }} />
+                        <Button transparent
+                        style={{ paddingBottom: 20 }}
+                        onPress={() => this.setState({ billModal: false, billContent: 'bill' })}>
+                            <Icon name='md-close' />
+                        </Button>
+                    </View>
+                    <View style={{ width: '100%' }}>
+                        <ScrollView style={{ height: height*.5 }}>
+                        <List>
+                            <ListItem style={{ marginLeft: 0 }}>
+                                <View style={{ width: 100, flexDirection: 'row', paddingLeft: 15 }}>
+                                    <Text>Type</Text>
+                                    <View style={{ flex: 1}} />
+                                </View>
+                                <View style={{ flex: 1}}>
+                                    <Item regular style={[styles.textInput, { backgroundColor: 'white', paddingRight: 0, marginRight: 0 } ]}>
+                                        <Input placeholderTextColor='#d4d8da' placeholder='ราคารวม' editable={false} value={'เงินสด'}
+                                            style={{ fontSize: 18, color: '#5cb85c', textAlign: 'right' }}
+                                        />
+                                    </Item>
+                                </View>
+                            </ListItem>
+                            <ListItem style={{ marginLeft: 0, flexDirection: 'row' }}>
+                                <View style={{ width: 100, flexDirection: 'row', paddingLeft: 15 }}>
+                                    <Text>รวม</Text>
+                                    <View style={{ flex: 1}} />
+                                </View>
+                                <View style={{ flex: 1}}>
+                                    <Item regular style={[styles.textInput, { backgroundColor: 'white', paddingRight: 0, marginRight: 0 } ]}>
+                                        <Input placeholderTextColor='#d4d8da' placeholder='รวม'
+                                            style={{ fontSize: 18, color: '#5cb85c', textAlign: 'right' }}
+                                        />
+                                    </Item>
+                                </View>
+                            </ListItem>
+                            <ListItem style={{ marginLeft: 0 }}>
+                                <View style={{ width: 100, flexDirection: 'row', paddingLeft: 15 }}>
+                                    <Text>สุทธิ</Text>
+                                    <View style={{ flex: 1}} />
+                                </View>
+                                <View style={{ flex: 1}}>
+                                    <Item regular style={[styles.textInput, { backgroundColor: 'white', paddingRight: 0, marginRight: 0 } ]}>
+                                        <Input placeholderTextColor='#d4d8da' placeholder='สุทธิ'
+                                            style={{ fontSize: 18, color: '#5cb85c', textAlign: 'right' }}
+                                        />
+                                    </Item>
+                                </View>
+                            </ListItem>
+                            <ListItem style={{ marginLeft: 0 }}>
+                                <View style={{ width: 100, flexDirection: 'row', paddingLeft: 15 }}>
+                                    <Text>ส่วนลด</Text>
+                                    <View style={{ flex: 1}} />
+                                </View>
+                                <View style={{ flex: 1}}>
+                                    <Item regular style={[styles.textInput, { backgroundColor: 'white', paddingRight: 0, marginRight: 0 } ]}>
+                                        <Input placeholderTextColor='#d4d8da' placeholder='ส่วนลด'
+                                            style={{ fontSize: 18, color: '#5cb85c', textAlign: 'right' }}
+                                        />
+                                    </Item>
+                                </View>
+                            </ListItem>
+                            <ListItem style={{ marginLeft: 0 }}>
+                                <View style={{ width: 100, flexDirection: 'row', paddingLeft: 15 }}>
+                                    <Text>ชำระ</Text>
+                                    <View style={{ flex: 1}} />
+                                </View>
+                                <View style={{ flex: 1}}>
+                                    <Item regular style={[styles.textInput, { backgroundColor: 'white', paddingRight: 0, marginRight: 0 } ]}>
+                                        <Input placeholderTextColor='#d4d8da' placeholder='ชำระ'
+                                            style={{ fontSize: 18, color: '#5cb85c', textAlign: 'right' }}
+                                        />
+                                    </Item>
+                                </View>
+                            </ListItem>
+                            <ListItem style={{ marginLeft: 0 }}>
+                                <View style={{ width: 100, flexDirection: 'row', paddingLeft: 15 }}>
+                                    <Text>ทอน</Text>
+                                    <View style={{ flex: 1}} />
+                                </View>
+                                <View style={{ flex: 1}}>
+                                    <Item regular style={[styles.textInput, { backgroundColor: 'white', paddingRight: 0, marginRight: 0 } ]}>
+                                        <Input placeholderTextColor='#d4d8da' placeholder='ทอน'
+                                            style={{ fontSize: 18, color: '#5cb85c', textAlign: 'right' }}
+                                        />
+                                    </Item>
+                                </View>
+                            </ListItem>
+                        </List>
+                        </ScrollView>
+                    </View>
+                </View>
+            )
+        }
+    }
 
     renderModalContent = () => (
         <View style={styles.modalContent}>
@@ -282,23 +415,13 @@ export default class Product extends Component<{}> {
                     <Header style={{ backgroundColor: '#3b5998' }}>
                         <Right>
                             <Button iconRight transparent
-                                onPress={() =>
-                                    ActionSheet.show(
-                                    {
-                                        options: BUTTONS,
-                                        cancelButtonIndex: CANCEL_INDEX,
-                                        destructiveButtonIndex: DESTRUCTIVE_INDEX,
-                                        title: "เลือกประเภทสินค้า (Category)"
-                                    },
-                                    buttonIndex => {
-                                        this.setState({ clicked: BUTTONS[buttonIndex] });
-                                    }
-                            )}>
+                                onPress={() => this.showCategoty() }>
                                 <Text style={{ color: 'white' }}>
                                     All
                                 </Text>
                                 <Icon name="md-arrow-dropdown" />
                             </Button>
+                            <ActionSheet ref={(c) => { this.actionSheet = c }} />
                         </Right>
                     </Header>
                     <Modal isVisible={this.state.billModal}>{this.renderBillModal()}</Modal>
