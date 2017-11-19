@@ -27,9 +27,44 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import GridView from 'react-native-super-grid';
-import { Container, Header, Content, Card, CardItem, Text, Body, Left, Button, Icon, Title, List, ListItem, Item, Input, Right, Form, Label } from 'native-base';
+import { Container, Header, Content, Card, CardItem, Text, Body, Left, Button, Icon, Title, List, ListItem, Item, Input, Right, Form, Label, Picker, ActionSheet } from 'native-base';
+import Modal from 'react-native-modal';
+
+var BUTTONS = [
+  { text: "เงินสด", icon: "md-arrow-dropright", iconColor: "#ea943b"},
+  { text: "บัตรเครดิต", icon: "md-arrow-dropright", iconColor: "#ea943b"},
+  { text: "คูปอง", icon: "md-arrow-dropright", iconColor: "#ea943b"}
+];
+// { text: "ซุป", icon: "md-arrow-dropright", iconColor: "#ea943b" },
+var DESTRUCTIVE_INDEX = 3;
+var CANCEL_INDEX = 4;
 
 export default class Bill extends Component<{}> {
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            dialogVisible: false
+        }
+        this.showCategoty = this.showCategoty.bind(this)
+    }
+
+    showCategoty = () => {
+        if ( this.actionSheet !== null ) {
+            this.actionSheet._root.showActionSheet(
+                {
+                    options: BUTTONS,
+                    cancelButtonIndex: CANCEL_INDEX,
+                    destructiveButtonIndex: DESTRUCTIVE_INDEX,
+                    title: "เลือกประเภทการชำระ"
+                },
+                buttonIndex => {
+                    this.setState({ clicked: BUTTONS[buttonIndex] });
+                }
+            )
+        }
+    }
+
     render() {
       return (
         <Container style={{ backgroundColor: '#fff' }}>
@@ -50,21 +85,22 @@ export default class Bill extends Component<{}> {
             </Header>
             <Content>
                 <List>
-                    <ListItem icon style={{ marginLeft: 0, paddingLeft: 20 }}>
-                        <Body>
-                            <Text>ประเภทการชำระ</Text>
-                        </Body>
-                        <Right style={{ flex: 1, flexDirection: 'row' }}>
-                             <Text note>เงินสด</Text>
-                             <Icon name="md-arrow-dropdown" />
-                        </Right>
+                    <ListItem icon style={{ marginLeft: 0, paddingLeft: 20 }} onPress={() => this.showCategoty() }>
+                            <Body>
+                                <Text>ประเภทการชำระ</Text>
+                            </Body>
+                            <Right style={{ flex: 1, flexDirection: 'row' }}>
+                                 <Text note>เงินสด</Text>
+                                 <Icon name="md-arrow-dropdown" />
+                            </Right>
+                            <ActionSheet ref={(c) => { this.actionSheet = c }} />
                     </ListItem>
                     <ListItem icon style={{ marginLeft: 0, paddingLeft: 20 }}>
                         <Body>
                             <Text>ราคารวม</Text>
                         </Body>
                         <Right style={{ flex: 1, flexDirection: 'row' }}>
-                             <Text note></Text>
+                             <Input />
                              <Icon name="arrow-forward" />
                         </Right>
                     </ListItem>
@@ -73,7 +109,7 @@ export default class Bill extends Component<{}> {
                             <Text>ส่วนลด</Text>
                         </Body>
                         <Right style={{ flex: 1, flexDirection: 'row' }}>
-                             <Text note></Text>
+                              <Input />
                              <Icon name="arrow-forward" />
                         </Right>
                     </ListItem>
@@ -90,7 +126,7 @@ export default class Bill extends Component<{}> {
                             <Text>ชำระ</Text>
                         </Body>
                         <Right style={{ flex: 1, flexDirection: 'row' }}>
-                             <Text note></Text>
+                              <Input style={{ borderBottomWidth: 1}}/>
                              <Icon name="arrow-forward" />
                         </Right>
                     </ListItem>
@@ -102,6 +138,21 @@ export default class Bill extends Component<{}> {
                              <Text note></Text>
                         </Right>
                     </ListItem>
+                    <Modal isVisible={this.state.dialogVisible}
+                    onBackdropPress={() => this.setState({dialogVisible: false})}
+                    style={{
+                        justifyContent: 'flex-end',
+                        margin: 0,
+                    }}>
+                        <View style={styles.modalContent}>
+                            <Item regular style={[styles.textInput, { backgroundColor: 'white', marginBottom: 10 } ]}>
+                                <Input placeholderTextColor='#d4d8da' ref={(c) => { this.editInput = c }} />
+                            </Item>
+                            <Button block success>
+                                <Text>เเก้ไข</Text>
+                            </Button>
+                        </View>
+                    </Modal>
                 </List>
             </Content>
         </Container>
@@ -119,6 +170,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     height: 150,
+  },
+  modalContent: {
+      backgroundColor: 'white',
+      padding: 22,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 4,
+      borderColor: 'rgba(0, 0, 0, 0.1)',
   },
   itemName: {
     fontSize: 16,

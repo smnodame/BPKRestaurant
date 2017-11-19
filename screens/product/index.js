@@ -54,17 +54,6 @@ export default class Product extends Component<{}> {
                 }
             )
         }
-        // ActionSheet.show(
-        //     {
-        //         options: BUTTONS,
-        //         cancelButtonIndex: CANCEL_INDEX,
-        //         destructiveButtonIndex: DESTRUCTIVE_INDEX,
-        //         title: "เลือกประเภทสินค้า (Category)"
-        //     },
-        //     buttonIndex => {
-        //         this.setState({ clicked: BUTTONS[buttonIndex] });
-        //     }
-        // )
     }
 
     renderBillModal = () => {
