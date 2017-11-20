@@ -153,7 +153,7 @@ export default class Login extends React.Component {
                         		<Title>Authentication</Title>
                         	</Body>
                         </Header>
-                        <KeyboardAvoidingView style={styles.container} behavior="padding">
+                        <View style={styles.container} behavior="padding">
                         		<Item regular style={[styles.textInput, { marginLeft: 15, marginRight: 15, marginBottom: 10, backgroundColor: 'white' } ]}>
                         			<Icon active name='ios-contact' style={{ color: '#d4d8da' }} />
                         			<Input
@@ -180,7 +180,7 @@ export default class Login extends React.Component {
 								{
 									!!this.state.error&&<Text style={{ textAlign: 'center', color: 'white', marginTop: 10 }}>{ this.state.error }</Text>
 								}
-                        </KeyboardAvoidingView>
+                        </View>
 					</Container>
 					:
 					<Container />
