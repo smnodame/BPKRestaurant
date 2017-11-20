@@ -9,6 +9,7 @@ import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import GridView from 'react-native-super-grid';
 import { Container, Header, Content, Card, CardItem, Text, Body, Left, Button, Icon, Title, List, ListItem, Item, Input, Right, Form, Label, Picker, ActionSheet } from 'native-base';
 import Modal from 'react-native-modal';
+import { NavigationActions } from 'react-navigation'
 
 var BUTTONS = [
   { text: "เงินสด", icon: "md-arrow-dropright", iconColor: "#ea943b"},
@@ -50,7 +51,7 @@ export default class Bill extends Component<{}> {
         <Container style={{ backgroundColor: '#fff' }}>
             <Header style={{ backgroundColor: '#3b5998' }}>
                 <Left>
-                    <Button transparent>
+                    <Button transparent onPress={() => this.props.navigation.dispatch(NavigationActions.back()) }>
                         <Icon name="md-arrow-round-back" />
                     </Button>
                 </Left>
@@ -58,7 +59,7 @@ export default class Bill extends Component<{}> {
                     <Title>ชำระเงิน</Title>
                 </Body>
                 <Right>
-                    <Button transparent>
+                    <Button transparent onPress={() => this.props.navigation.dispatch(NavigationActions.back()) }>
                         <Icon name="md-checkmark" />
                     </Button>
                 </Right>
