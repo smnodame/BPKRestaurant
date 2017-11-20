@@ -89,7 +89,7 @@ export default class Programs extends React.Component {
                 onPress={() => this.restaurant() }
 			>
 				<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 15, paddingRight: 15 }}>
-					<Icon style={{color: '#4c4c4c'}} name='ios-person-outline' />
+					<Icon style={{color: '#4c4c4c'}} name='md-restaurant' />
 					<Text style={{color: '#4c4c4c' }}>{ activity.app_id.toUpperCase() }</Text>
 					<Icon style={{color: '#4c4c4c'}} name='ios-arrow-forward-outline' />
 				</View>
