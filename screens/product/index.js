@@ -49,6 +49,8 @@ export default class Product extends Component<{}> {
         this.openControlPanel = this.openControlPanel.bind(this)
         this.backToPrograms = this.backToPrograms.bind(this)
         this.logout = this.logout.bind(this)
+        this.goToRestaurantPage = this.goToRestaurantPage.bind(this)
+        this.goToTablePage = this.goToTablePage.bind(this)
         // Event Listener for orientation changes
         Dimensions.addEventListener('change', () => {
             const {height, width} = Dimensions.get('window')
@@ -66,6 +68,26 @@ export default class Product extends Component<{}> {
         	index: 0,
         	actions: [
         		NavigationActions.navigate({ routeName: 'Login'})
+        	]
+        })
+        this.props.navigation.dispatch(resetAction)
+	}
+
+    goToRestaurantPage = () => {
+        const resetAction = NavigationActions.reset({
+        	index: 0,
+        	actions: [
+        		NavigationActions.navigate({ routeName: 'Restaurant'})
+        	]
+        })
+        this.props.navigation.dispatch(resetAction)
+	}
+
+    goToTablePage = () => {
+        const resetAction = NavigationActions.reset({
+        	index: 0,
+        	actions: [
+        		NavigationActions.navigate({ routeName: 'Table'})
         	]
         })
         this.props.navigation.dispatch(resetAction)
@@ -389,10 +411,26 @@ export default class Product extends Component<{}> {
                         </Button>
                     </Left>
                     <Body style={{ flexDirection: 'row'}}>
-                        <Text style={{ color: 'white', marginRight: 6 }}>
+                        <Text style={{
+                                color: 'white',
+                                marginRight: 6,
+                                paddingTop: 8,
+                                paddingBottom: 8
+                            }}
+                            onPress={() => this.goToRestaurantPage() }
+
+                        >
                             ศูนย์อาหาร 1  >
                         </Text>
-                        <Text style={{ color: 'white' }}>
+                        <Text style={{
+                                color: 'white',
+                                marginRight: 6,
+                                paddingTop: 8,
+                                paddingBottom: 8
+                            }}
+                            onPress={() => this.goToTablePage() }
+
+                        >
                             โต๊ะ 1
                         </Text>
                     </Body>

@@ -44,6 +44,7 @@ export default class Table extends Component<{}> {
         this.backToPrograms = this.backToPrograms.bind(this)
         this.logout = this.logout.bind(this)
         this.gotoMenuPage = this.gotoMenuPage.bind(this)
+        this.goToRestaurantPage = this.goToRestaurantPage.bind(this)
     }
 
     logout = () => {
@@ -51,6 +52,16 @@ export default class Table extends Component<{}> {
         	index: 0,
         	actions: [
         		NavigationActions.navigate({ routeName: 'Login'})
+        	]
+        })
+        this.props.navigation.dispatch(resetAction)
+	}
+
+    goToRestaurantPage = () => {
+        const resetAction = NavigationActions.reset({
+        	index: 0,
+        	actions: [
+        		NavigationActions.navigate({ routeName: 'Restaurant'})
         	]
         })
         this.props.navigation.dispatch(resetAction)
@@ -150,7 +161,10 @@ export default class Table extends Component<{}> {
                       </Button>
                   </Left>
                   <Body>
-                      <Title>ศูนย์อาหาร 1</Title>
+                      <Title
+                        style={{ padding: 5 }}
+                        onPress={() => this.goToRestaurantPage() }
+                      >ศูนย์อาหาร 1</Title>
                   </Body>
                 </Header>
                 <Content>
