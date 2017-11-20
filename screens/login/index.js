@@ -81,13 +81,13 @@ export default class Login extends React.Component {
 				// 	AsyncStorage.setItem('token',  response.data.token)
 				// 	.then(() => {
 				// 		AsyncStorage.setItem('app_list', JSON.stringify(response.data.app_list)).then(() => {
-				// 			const resetAction = NavigationActions.reset({
-				// 					index: 0,
-				// 					actions: [
-				// 						NavigationActions.navigate({ routeName: 'ChooseProgram'})
-				// 					]
-				// 				})
-				// 			this.props.navigation.dispatch(resetAction)
+				const resetAction = NavigationActions.reset({
+						index: 0,
+						actions: [
+							NavigationActions.navigate({ routeName: 'Programs'})
+						]
+					})
+				this.props.navigation.dispatch(resetAction)
 				// 		})
 				// 	})
 				// } else {
