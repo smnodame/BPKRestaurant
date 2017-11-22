@@ -5,7 +5,7 @@
  */
 
 import React, { Component } from 'react';
-import { StyleSheet, View, Platform, Image, Dimensions } from 'react-native';
+import { StyleSheet, View, Platform, Image, Dimensions, AsyncStorage } from 'react-native';
 import GridView from 'react-native-super-grid';
 import {
 	Content,
@@ -41,11 +41,28 @@ export default class Restaurant extends Component<{}> {
     constructor(props) {
         super(props);
         this.state = {
+			restaurants: []
         }
 		this.openControlPanel = this.openControlPanel.bind(this)
         this.backToPrograms = this.backToPrograms.bind(this)
         this.logout = this.logout.bind(this)
+		this.rendetRestaurant = this.rendetRestaurant.bind(this)
     }
+
+	componentDidMount = () => {
+		AsyncStorage.getItem('token').then((token) => {
+			AsyncStorage.getItem('password').then((password) => {
+				fetch(`http://itsmartone.com/pos/api/user/pos_list?token=${token}&emp_id=system&password=${password}`)
+				.then((res) => res.json())
+				.then((res) => {
+					this.setState({
+						restaurants: res.data
+					})
+				})
+			})
+		})
+
+	}
 
     logout = () => {
         const resetAction = NavigationActions.reset({
@@ -70,6 +87,26 @@ export default class Restaurant extends Component<{}> {
             })
         this.props.navigation.dispatch(resetAction)
     }
+
+	rendetRestaurant = () => {
+		return this.state.restaurants.map((restaurant) => {
+				return (
+					<Button bordered block
+                        style={{ backgroundColor: 'white', borderColor: '#d3d3d3', borderBottomWidth: 0.5, marginBottom: 15 }}
+                        onPress={() => this.props.navigation.navigate("Table")}
+                    >
+                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 5, paddingRight: 5 }}>
+                            <Text style={{color: '#4c4c4c' }}>
+								{
+									 restaurant.pos_name
+								}
+							</Text>
+                            <Icon style={{color: '#4c4c4c'}} name='ios-arrow-forward-outline' />
+                        </View>
+                    </Button>
+				)
+		})
+	}
 
     render() {
 
@@ -132,26 +169,9 @@ export default class Restaurant extends Component<{}> {
                     </Body>
                 </Header>
                 <Content style={{ padding: 20 }}>
-                    <Button bordered block
-                        style={{ backgroundColor: 'white', borderColor: '#d3d3d3', borderBottomWidth: 0.5, marginBottom: 15 }}
-                        onPress={() => this.props.navigation.navigate("Table")}
-                    >
-                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 15, paddingRight: 15 }}>
-                            <Icon style={{color: '#4c4c4c'}} name='restaurant' />
-                            <Text style={{color: '#4c4c4c' }}>WS001 - ศูนย์อาหาร 1 </Text>
-                            <Icon style={{color: '#4c4c4c'}} name='ios-arrow-forward-outline' />
-                        </View>
-                    </Button>
-                    <Button bordered block
-                        style={{ backgroundColor: 'white', borderColor: '#d3d3d3', borderBottomWidth: 0.5, marginBottom: 15 }}
-                        onPress={() => this.props.navigation.navigate("Table")}
-                    >
-                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 15, paddingRight: 15 }}>
-                            <Icon style={{color: '#4c4c4c'}} name='restaurant' />
-                            <Text style={{color: '#4c4c4c' }}>WS002 - ศูนย์อาหาร 2 </Text>
-                            <Icon style={{color: '#4c4c4c'}} name='ios-arrow-forward-outline' />
-                        </View>
-                    </Button>
+					{
+						this.rendetRestaurant()
+					}
                 </Content>
             </Container>
         </Drawer>
