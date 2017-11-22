@@ -55,9 +55,7 @@ export default class Programs extends React.Component {
 			isReady: false,
 			page: 'Login',
 			token: "",
-			activity: [{
-                app_id: 'ร้านอาหาร'
-            }]
+			activity: []
         }
 		Keyboard.dismiss()
 		this.openControlPanel = this.openControlPanel.bind(this)
@@ -77,9 +75,9 @@ export default class Programs extends React.Component {
     }
 
 	async componentWillMount() {
-		// AsyncStorage.getItem('app_list', (err, result) => {
-		// 	this.setState({ activity: JSON.parse(result) })
-		// })
+		AsyncStorage.getItem('app_list', (err, result) => {
+			this.setState({ activity: JSON.parse(result) })
+		})
         this.setState({ isReady: true })
     }
 
@@ -103,13 +101,16 @@ export default class Programs extends React.Component {
 	}
 
 	logout = () => {
-        const resetAction = NavigationActions.reset({
-        	index: 0,
-        	actions: [
-        		NavigationActions.navigate({ routeName: 'Login'})
-        	]
-        })
-        this.props.navigation.dispatch(resetAction)
+		AsyncStorage.removeItem('token')
+		.then(() => {
+			const resetAction = NavigationActions.reset({
+					index: 0,
+					actions: [
+						NavigationActions.navigate({ routeName: 'Login'})
+					]
+				})
+				this.props.navigation.dispatch(resetAction)
+		})
 	}
 
     render() {

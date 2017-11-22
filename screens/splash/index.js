@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Image, View} from 'react-native';
+import { StyleSheet, Image, View, AsyncStorage } from 'react-native';
 import { NavigationActions } from 'react-navigation'
 
 export default class Splash extends React.Component {
@@ -9,13 +9,25 @@ export default class Splash extends React.Component {
 
     componentDidMount() {
         setTimeout(() => {
-            const resetAction = NavigationActions.reset({
-					index: 0,
-					actions: [
-						NavigationActions.navigate({ routeName: 'Login'})
-					]
-				})
-			this.props.navigation.dispatch(resetAction)
+            AsyncStorage.getItem('token').then((token) => {
+    			if(token) {
+    				const resetAction = NavigationActions.reset({
+    						index: 0,
+    						actions: [
+    							NavigationActions.navigate({ routeName: 'Programs'})
+    						]
+    					})
+    				this.props.navigation.dispatch(resetAction)
+    			} else {
+                    const resetAction = NavigationActions.reset({
+        					index: 0,
+        					actions: [
+        						NavigationActions.navigate({ routeName: 'Login'})
+        					]
+        				})
+        			this.props.navigation.dispatch(resetAction)
+                }
+    		})
         }, 1500)
     }
 

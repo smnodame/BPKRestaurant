@@ -55,17 +55,6 @@ export default class Login extends React.Component {
         }
 		this.openControlPanel = this.openControlPanel.bind(this)
 		this.onLogin = this.onLogin.bind(this)
-		// AsyncStorage.getItem('token').then((token) => {
-		// 	if(token) {
-		// 		const resetAction = NavigationActions.reset({
-		// 				index: 0,
-		// 				actions: [
-		// 					NavigationActions.navigate({ routeName: 'ChooseProgram'})
-		// 				]
-		// 			})
-		// 		this.props.navigation.dispatch(resetAction)
-		// 	}
-		// })
     }
 
 	openControlPanel = () => {
@@ -76,23 +65,23 @@ export default class Login extends React.Component {
 		if(this.state.username && this.state.password) {
 			axios.get('http://itsmartone.com/bpkservice/api/user/login?username=' + this.state.username + '&password='+ this.state.password)
 			.then((response) => {
-				// if(response.data.success == "1") {
-				// 	this.setState({ error: "" })
-				// 	AsyncStorage.setItem('token',  response.data.token)
-				// 	.then(() => {
-				// 		AsyncStorage.setItem('app_list', JSON.stringify(response.data.app_list)).then(() => {
-				const resetAction = NavigationActions.reset({
-						index: 0,
-						actions: [
-							NavigationActions.navigate({ routeName: 'Programs'})
-						]
+				if(response.data.success == "1") {
+					this.setState({ error: "" })
+					AsyncStorage.setItem('token',  response.data.token)
+					.then(() => {
+						AsyncStorage.setItem('app_list', JSON.stringify(response.data.app_list)).then(() => {
+							const resetAction = NavigationActions.reset({
+									index: 0,
+									actions: [
+										NavigationActions.navigate({ routeName: 'Programs'})
+									]
+								})
+							this.props.navigation.dispatch(resetAction)
+						})
 					})
-				this.props.navigation.dispatch(resetAction)
-				// 		})
-				// 	})
-				// } else {
-				// 	this.setState({ error: response.data.error, password: ""})
-				// }
+				} else {
+					this.setState({ error: response.data.error, password: ""})
+				}
 			})
 		} else {
 			this.setState({ error: 'กรุณาระบุ Username เเละ Password' })
