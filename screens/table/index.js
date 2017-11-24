@@ -4,7 +4,7 @@
  * @flow
  */
  import React, { Component } from 'react';
- import { StyleSheet, View, Platform, Image, Dimensions, TouchableOpacity } from 'react-native';
+ import { StyleSheet, View, Platform, Image, Dimensions, TouchableOpacity, AsyncStorage } from 'react-native';
  import GridView from 'react-native-super-grid';
  import {
  	Content,
@@ -39,6 +39,8 @@ export default class Table extends Component<{}> {
     constructor(props) {
         super(props);
         this.state = {
+            title: '',
+            tables: []
         }
 		this.openControlPanel = this.openControlPanel.bind(this)
         this.backToPrograms = this.backToPrograms.bind(this)
@@ -46,6 +48,26 @@ export default class Table extends Component<{}> {
         this.gotoMenuPage = this.gotoMenuPage.bind(this)
         this.goToRestaurantPage = this.goToRestaurantPage.bind(this)
     }
+
+    componentDidMount = () => {
+		AsyncStorage.getItem('token').then((token) => {
+			AsyncStorage.getItem('section_pos_id').then((section_pos_id) => {
+                fetch(`http://itsmartone.com/pos/api/sell/table_list?token=${token}&section_pos_id=${section_pos_id}`).then((res) => res.json())
+                .then((res) => {
+                    this.setState({
+                        tables: res.data
+                    })
+                })
+			})
+		})
+
+        AsyncStorage.getItem('pos_name').then((pos_name) => {
+			this.setState({
+                pos_name: pos_name
+            })
+		})
+	}
+
 
     logout = () => {
         const resetAction = NavigationActions.reset({
@@ -93,18 +115,18 @@ export default class Table extends Component<{}> {
 
     render() {
       // Taken from https://flatuicolors.com/
-      const items = [
-        { name: 'โต๊ะ 1', code: '#1abc9c' }, { name: 'โต๊ะ 2', code: '#2ecc71' },
-        { name: 'โต๊ะ 3', code: '#3498db' }, { name: 'โต๊ะ 4', code: '#9b59b6' },
-        { name: 'โต๊ะ 5', code: '#34495e' }, { name: 'โต๊ะ 6', code: '#16a085' },
-        { name: 'โต๊ะ 7', code: '#27ae60' }, { name: 'โต๊ะ 8', code: '#2980b9' },
-        { name: 'โต๊ะ 9', code: '#8e44ad' }, { name: 'โต๊ะ 10', code: '#2c3e50' },
-        { name: 'SUN FLOWER', code: '#f1c40f' }, { name: 'CARROT', code: '#e67e22' },
-        { name: 'ALIZARIN', code: '#e74c3c' }, { name: 'CLOUDS', code: '#ecf0f1' },
-        { name: 'CONCRETE', code: '#95a5a6' }, { name: 'ORANGE', code: '#f39c12' },
-        { name: 'PUMPKIN', code: '#d35400' }, { name: 'POMEGRANATE', code: '#c0392b' },
-        { name: 'SILVER', code: '#bdc3c7' }, { name: 'ASBESTOS', code: '#7f8c8d' },
-      ];
+    //   const items = [
+    //     { name: 'โต๊ะ 1', code: '#1abc9c' }, { name: 'โต๊ะ 2', code: '#2ecc71' },
+    //     { name: 'โต๊ะ 3', code: '#3498db' }, { name: 'โต๊ะ 4', code: '#9b59b6' },
+    //     { name: 'โต๊ะ 5', code: '#34495e' }, { name: 'โต๊ะ 6', code: '#16a085' },
+    //     { name: 'โต๊ะ 7', code: '#27ae60' }, { name: 'โต๊ะ 8', code: '#2980b9' },
+    //     { name: 'โต๊ะ 9', code: '#8e44ad' }, { name: 'โต๊ะ 10', code: '#2c3e50' },
+    //     { name: 'SUN FLOWER', code: '#f1c40f' }, { name: 'CARROT', code: '#e67e22' },
+    //     { name: 'ALIZARIN', code: '#e74c3c' }, { name: 'CLOUDS', code: '#ecf0f1' },
+    //     { name: 'CONCRETE', code: '#95a5a6' }, { name: 'ORANGE', code: '#f39c12' },
+    //     { name: 'PUMPKIN', code: '#d35400' }, { name: 'POMEGRANATE', code: '#c0392b' },
+    //     { name: 'SILVER', code: '#bdc3c7' }, { name: 'ASBESTOS', code: '#7f8c8d' },
+    //   ];
 
       return (
           <Drawer
@@ -164,29 +186,30 @@ export default class Table extends Component<{}> {
                       <Title
                         style={{ padding: 5 }}
                         onPress={() => this.goToRestaurantPage() }
-                      >ศูนย์อาหาร 1</Title>
+                      >{ this.state.pos_name }</Title>
                   </Body>
+                  <Right/>
                 </Header>
                 <Content>
                     <GridView
                         itemWidth={130}
-                        items={items}
+                        items={this.state.tables}
                         style={styles.gridView}
                         renderItem={item => (
                             <TouchableOpacity onPress={() => this.gotoMenuPage()}>
                                 <View style={{ backgroundColor: 'white', borderRadius: 5, height: 220, borderColor: '#d3d3d3', borderWidth: 1}}>
                                     <View style={{ padding: 15, backgroundColor: '#dfe3ee', borderTopLeftRadius: 5, borderTopRightRadius: 5 }}>
-                                        <Text numberOfLines={1} >{ item.name }</Text>
+                                        <Text numberOfLines={1} >NO { item.table_no }</Text>
                                     </View>
                                     {
-                                        item.name!='โต๊ะ 1'&&<View style={{ padding: 15 }}>
+                                        item.isused=='T'&&<View style={{ padding: 15 }}>
                                             <Text numberOfLines={1} style={{ color: '#4c4c4c', fontSize: 13, marginBottom: 5 }}>กระเพรากุ้ง x 100 (สั่ง)</Text>
                                             <Text numberOfLines={1} style={{ color: '#4c4c4c', fontSize: 13, marginBottom: 5 }}>กระเพราหมู x 2 (สั่ง)</Text>
                                             <Text numberOfLines={1} style={{ color: '#4c4c4c', fontSize: 13, marginBottom: 5 }}>ส้มตำ x 1 (สั่ง)</Text>
                                         </View>
                                     }
                                     {
-                                        item.name=='โต๊ะ 1'&&<View style={{ padding: 15,flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                        item.isused!='T'&&<View style={{ padding: 15,flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                                             <Text numberOfLines={1} style={{ fontSize: 20, color: '#d3d3d3' }}>ว่าง</Text>
                                         </View>
                                     }

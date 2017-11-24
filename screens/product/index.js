@@ -5,7 +5,7 @@
  */
 
 import React, { Component } from 'react';
-import { StyleSheet, View, TouchableOpacity, Platform, Image, ScrollView, Dimensions } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Platform, Image, ScrollView, Dimensions, AsyncStorage } from 'react-native';
 import GridView from 'react-native-super-grid';
 import { Container, Header, Content, Card, CardItem, Root, ActionSheet, Text, Body, Left, Button, Label, Icon, Title, Right, Item, Switch, Input, List, ListItem, Separator  } from 'native-base';
 import PopupDialog, {
@@ -62,6 +62,26 @@ export default class Product extends Component<{}> {
 
         })
     }
+
+    componentDidMount = () => {
+		AsyncStorage.getItem('token').then((token) => {
+			AsyncStorage.getItem('section_pos_id').then((section_pos_id) => {
+                fetch(`http://itsmartone.com/pos/api/sell/product_list?token=${token}&section_pos_id=${section_pos_id}`).then((res) => res.json())
+                .then((res) => {
+                    console.log(res)
+                    // this.setState({
+                    //     product_list: res.data
+                    // })
+                })
+			})
+		})
+
+        AsyncStorage.getItem('pos_name').then((pos_name) => {
+			this.setState({
+                pos_name: pos_name
+            })
+		})
+	}
 
     logout = () => {
         const resetAction = NavigationActions.reset({

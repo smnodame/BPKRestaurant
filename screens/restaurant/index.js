@@ -47,6 +47,7 @@ export default class Restaurant extends Component<{}> {
         this.backToPrograms = this.backToPrograms.bind(this)
         this.logout = this.logout.bind(this)
 		this.rendetRestaurant = this.rendetRestaurant.bind(this)
+		this.goToTablePage = this.goToTablePage.bind(this)
     }
 
 	componentDidMount = () => {
@@ -88,12 +89,28 @@ export default class Restaurant extends Component<{}> {
         this.props.navigation.dispatch(resetAction)
     }
 
+	goToTablePage = (section_pos_id, pos_name) => {
+		AsyncStorage.setItem('section_pos_id',  section_pos_id)
+		.then(() => {
+			AsyncStorage.setItem('pos_name',  pos_name)
+			.then(() => {
+				const resetAction = NavigationActions.reset({
+		                index: 0,
+		                actions: [
+		                    NavigationActions.navigate({ routeName: 'Table'})
+		                ]
+		            })
+		        this.props.navigation.dispatch(resetAction)
+			})
+		})
+	}
+
 	rendetRestaurant = () => {
 		return this.state.restaurants.map((restaurant) => {
 				return (
 					<Button bordered block
                         style={{ backgroundColor: 'white', borderColor: '#d3d3d3', borderBottomWidth: 0.5, marginBottom: 15 }}
-                        onPress={() => this.props.navigation.navigate("Table")}
+                        onPress={() => this.goToTablePage(restaurant.section_pos_id, restaurant.pos_name) }
                     >
                         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 5, paddingRight: 5 }}>
                             <Text style={{color: '#4c4c4c' }}>
