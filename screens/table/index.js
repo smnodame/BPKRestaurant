@@ -69,7 +69,6 @@ export default class Table extends Component<{}> {
 		})
 	}
 
-
     logout = () => {
         const resetAction = NavigationActions.reset({
         	index: 0,
@@ -104,30 +103,19 @@ export default class Table extends Component<{}> {
         this.props.navigation.dispatch(resetAction)
     }
 
-    gotoMenuPage = () => {
-        const resetAction = NavigationActions.reset({
-                index: 0,
-                actions: [
-                    NavigationActions.navigate({ routeName: 'Product'})
-                ]
-            })
-        this.props.navigation.dispatch(resetAction)
+    gotoMenuPage = (table_no) => {
+        AsyncStorage.setItem('table_no', table_no).then(() => {
+            const resetAction = NavigationActions.reset({
+                    index: 0,
+                    actions: [
+                        NavigationActions.navigate({ routeName: 'Product'})
+                    ]
+                })
+            this.props.navigation.dispatch(resetAction)
+        })
     }
 
     render() {
-      // Taken from https://flatuicolors.com/
-    //   const items = [
-    //     { name: 'โต๊ะ 1', code: '#1abc9c' }, { name: 'โต๊ะ 2', code: '#2ecc71' },
-    //     { name: 'โต๊ะ 3', code: '#3498db' }, { name: 'โต๊ะ 4', code: '#9b59b6' },
-    //     { name: 'โต๊ะ 5', code: '#34495e' }, { name: 'โต๊ะ 6', code: '#16a085' },
-    //     { name: 'โต๊ะ 7', code: '#27ae60' }, { name: 'โต๊ะ 8', code: '#2980b9' },
-    //     { name: 'โต๊ะ 9', code: '#8e44ad' }, { name: 'โต๊ะ 10', code: '#2c3e50' },
-    //     { name: 'SUN FLOWER', code: '#f1c40f' }, { name: 'CARROT', code: '#e67e22' },
-    //     { name: 'ALIZARIN', code: '#e74c3c' }, { name: 'CLOUDS', code: '#ecf0f1' },
-    //     { name: 'CONCRETE', code: '#95a5a6' }, { name: 'ORANGE', code: '#f39c12' },
-    //     { name: 'PUMPKIN', code: '#d35400' }, { name: 'POMEGRANATE', code: '#c0392b' },
-    //     { name: 'SILVER', code: '#bdc3c7' }, { name: 'ASBESTOS', code: '#7f8c8d' },
-    //   ];
 
       return (
           <Drawer
@@ -183,11 +171,20 @@ export default class Table extends Component<{}> {
                           <Icon name="md-menu" />
                       </Button>
                   </Left>
-                  <Body style={{flex: 3}}>
-                      <Title
-                        style={{ padding: 5 }}
-                        onPress={() => this.goToRestaurantPage() }
-                      >{ this.state.pos_name }</Title>
+                  <Body style={{flex: 3, flexDirection: 'row'}}>
+                        <Text style={{
+                                color: 'white',
+                                marginRight: 6,
+                                paddingTop: 8,
+                                paddingBottom: 8,
+                                flex: 1
+                            }}
+                            numberOfLines={1}
+                            onPress={() => this.goToRestaurantPage() }
+
+                        >
+                            { this.state.pos_name }
+                        </Text>
                   </Body>
                   <Right/>
                 </Header>
@@ -197,7 +194,7 @@ export default class Table extends Component<{}> {
                         items={this.state.tables}
                         style={styles.gridView}
                         renderItem={item => (
-                            <TouchableOpacity  onPress={() => this.gotoMenuPage()}>
+                            <TouchableOpacity  onPress={() => this.gotoMenuPage(item.table_no)}>
                                 <View style={{ backgroundColor: 'white', borderRadius: 5, height: 220, borderColor: '#d3d3d3', borderWidth: 1}}>
                                     <View style={{ padding: 15, backgroundColor: '#dfe3ee', borderTopLeftRadius: 5, borderTopRightRadius: 5 }}>
                                         <Text numberOfLines={1} >โต๊ะ { item.table_no }</Text>

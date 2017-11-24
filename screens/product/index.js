@@ -44,7 +44,9 @@ export default class Product extends Component<{}> {
             billHeight: height*.5,
             category: [],
             product_list: [],
-            products: []
+            products: [],
+            table_no: '',
+            pos_name: ''
         }
         this.renderModalContent = this.renderModalContent.bind(this)
         this.renderBillModal = this.renderBillModal.bind(this)
@@ -79,7 +81,6 @@ export default class Product extends Component<{}> {
                         }
                     })
                     category.push({ text: "All", icon: "md-arrow-dropright", iconColor: "#ea943b"})
-                    console.log(res.data)
                     this.setState({
                         product_list: res.data.products,
                         category: category,
@@ -91,9 +92,15 @@ export default class Product extends Component<{}> {
 
         AsyncStorage.getItem('pos_name').then((pos_name) => {
 			this.setState({
-                pos_name: pos_name
+                pos_name
             })
 		})
+
+        AsyncStorage.getItem('table_no').then((table_no) => {
+            this.setState({
+                table_no: 'โต๊ะ ' + table_no
+            })
+        })
 	}
 
     logout = () => {
@@ -374,23 +381,35 @@ export default class Product extends Component<{}> {
                                 color: 'white',
                                 marginRight: 6,
                                 paddingTop: 8,
-                                paddingBottom: 8
+                                paddingBottom: 8,
+                                flex: 1
                             }}
+                            numberOfLines={1}
                             onPress={() => this.goToRestaurantPage() }
 
                         >
-                            ศูนย์อาหาร 1  >
+                            { this.state.pos_name }
                         </Text>
                         <Text style={{
                                 color: 'white',
                                 marginRight: 6,
                                 paddingTop: 8,
                                 paddingBottom: 8
+                            }}>
+                            >
+                        </Text>
+                        <Text style={{
+                                color: 'white',
+                                marginRight: 6,
+                                paddingTop: 8,
+                                paddingBottom: 8,
+                                flex: 1
                             }}
+                            numberOfLines={1}
                             onPress={() => this.goToTablePage() }
 
                         >
-                            โต๊ะ 1
+                            { this.state.table_no }
                         </Text>
                     </Body>
                     <Right>
