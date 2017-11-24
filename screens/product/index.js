@@ -369,7 +369,7 @@ export default class Product extends Component<{}> {
                             <Icon name="md-menu" />
                         </Button>
                     </Left>
-                    <Body style={{ flexDirection: 'row'}}>
+                    <Body style={{ flex: 3, flexDirection: 'row'}}>
                         <Text style={{
                                 color: 'white',
                                 marginRight: 6,

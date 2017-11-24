@@ -183,7 +183,7 @@ export default class Table extends Component<{}> {
                           <Icon name="md-menu" />
                       </Button>
                   </Left>
-                  <Body>
+                  <Body style={{flex: 3}}>
                       <Title
                         style={{ padding: 5 }}
                         onPress={() => this.goToRestaurantPage() }
