@@ -46,7 +46,11 @@ export default class Product extends Component<{}> {
             product_list: [],
             products: [],
             table_no: '',
-            pos_name: ''
+            pos_name: '',
+            choosed_category: {
+                id: '0',
+                name: 'ALL'
+            }
         }
         this.renderModalContent = this.renderModalContent.bind(this)
         this.renderBillModal = this.renderBillModal.bind(this)
@@ -77,10 +81,11 @@ export default class Product extends Component<{}> {
                         return {
                             text: category.detail,
                             icon: "md-arrow-dropright",
-                            iconColor: "#ea943b"
+                            iconColor: "#ea943b",
+                            id: category.product_cat_id
                         }
                     })
-                    category.push({ text: "All", icon: "md-arrow-dropright", iconColor: "#ea943b"})
+                    category.push({ text: "All", icon: "md-arrow-dropright", iconColor: "#ea943b", id : "0"})
                     this.setState({
                         product_list: res.data.products,
                         category: category,
@@ -157,7 +162,16 @@ export default class Product extends Component<{}> {
                     title: "เลือกประเภทสินค้า (Category)"
                 },
                 buttonIndex => {
-                    this.setState({ clicked: this.state.category[buttonIndex] });
+                    const product_list = this.state.product_list.filter((product) => {
+                        return this.state.category[buttonIndex].id == product.product_cat_id
+                    })
+
+                    this.setState({ choosed_category: {
+                            name: this.state.category[buttonIndex].text,
+                            id: this.state.category[buttonIndex].id,
+                        },
+                        products: product_list
+                    })
                 }
             )
         }
@@ -424,7 +438,9 @@ export default class Product extends Component<{}> {
                             <Button iconRight transparent
                                 onPress={() => this.showCategoty() }>
                                 <Text style={{ color: 'white' }}>
-                                    All
+                                    {
+                                        this.state.choosed_category.name
+                                    }
                                 </Text>
                                 <Icon name="md-arrow-dropdown" />
                             </Button>
