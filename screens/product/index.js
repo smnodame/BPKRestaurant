@@ -41,7 +41,10 @@ export default class Product extends Component<{}> {
         this.state = {
             dialogVisible: false,
             billModal: false,
-            billHeight: height*.5
+            billHeight: height*.5,
+            category: [],
+            product_list: [],
+            products: []
         }
         this.renderModalContent = this.renderModalContent.bind(this)
         this.renderBillModal = this.renderBillModal.bind(this)
@@ -68,10 +71,20 @@ export default class Product extends Component<{}> {
 			AsyncStorage.getItem('section_pos_id').then((section_pos_id) => {
                 fetch(`http://itsmartone.com/pos/api/sell/product_list?token=${token}&section_pos_id=${section_pos_id}`).then((res) => res.json())
                 .then((res) => {
-                    console.log(res)
-                    // this.setState({
-                    //     product_list: res.data
-                    // })
+                    const category = res.data.product_cats.map((category) => {
+                        return {
+                            text: category.detail,
+                            icon: "md-arrow-dropright",
+                            iconColor: "#ea943b"
+                        }
+                    })
+                    category.push({ text: "All", icon: "md-arrow-dropright", iconColor: "#ea943b"})
+                    console.log(res.data)
+                    this.setState({
+                        product_list: res.data.products,
+                        category: category,
+                        products: res.data.products.filter((product, index) => index<50)
+                    })
                 })
 			})
 		})
@@ -131,13 +144,13 @@ export default class Product extends Component<{}> {
         if ( this.actionSheet !== null ) {
             this.actionSheet._root.showActionSheet(
                 {
-                    options: BUTTONS,
+                    options: this.state.category,
                     cancelButtonIndex: CANCEL_INDEX,
                     destructiveButtonIndex: DESTRUCTIVE_INDEX,
                     title: "เลือกประเภทสินค้า (Category)"
                 },
                 buttonIndex => {
-                    this.setState({ clicked: BUTTONS[buttonIndex] });
+                    this.setState({ clicked: this.state.category[buttonIndex] });
                 }
             )
         }
@@ -300,80 +313,6 @@ export default class Product extends Component<{}> {
 
 
     render() {
-        const items = [
-                {
-                    key: 1,
-                    price: 300,
-                    name: {
-                        th: 'ไก่ทอดเกลือตะไคร้กรอบ',
-                        en: 'NOODLE'
-                    },
-                    uri: 'http://www.chingcancook.com/head_photo/02_20150122172551GLWY.jpg'
-                },
-                {
-                    key: 2,
-                    price: 120,
-                    name:  {
-                        th: 'ทอดมันข้าวโพดกุ้งสับ',
-                        en: 'SHUSI'
-                    },
-                    uri: 'http://www.easycookingmenu.com/media/k2/items/cache/e2bf3b11df0b872112757f1c2fee6e32_XL.jpg'
-                },
-                {
-                    key: 3,
-                    price: 100,
-                    name: {
-                        th: 'ทอดมันปลากราย',
-                        en: 'STECK'
-                    },
-                    uri: 'https://s.isanook.com/mn/0/rp/r/w700h420/ya0xa0m1w0/aHR0cHM6Ly9zLmlzYW5vb2suY29tL21uLzAvdWQvMzIvMTYzOTEyL3N0ZWFrc21hbGwuanBn.jpg'
-                },
-                {
-                    key: 4,
-                    price: 20,
-                    name: {
-                        th: 'กุ้งมะนาว เปรี้ยวแซ่บ',
-                        en: 'RICE'
-                    },
-                    uri: 'http://ipattaya.co/wp-content/uploads/2016/12/DSC08017.jpg'
-                },
-                {
-                    key: 5,
-                    price: 300,
-                    name: {
-                        th: 'ไก่ทอดเกลือตะไคร้กรอบ',
-                        en: 'NOODLE'
-                    },
-                    uri: 'http://www.chingcancook.com/head_photo/02_20150122172551GLWY.jpg'
-                },
-                {
-                    key: 6,
-                    price: 120,
-                    name:  {
-                        th: 'ทอดมันข้าวโพดกุ้งสับ',
-                        en: 'SHUSI'
-                    },
-                    uri: 'http://www.easycookingmenu.com/media/k2/items/cache/e2bf3b11df0b872112757f1c2fee6e32_XL.jpg'
-                },
-                {
-                    key: 7,
-                    price: 100,
-                    name: {
-                        th: 'ทอดมันปลากราย',
-                        en: 'STECK'
-                    },
-                    uri: 'https://s.isanook.com/mn/0/rp/r/w700h420/ya0xa0m1w0/aHR0cHM6Ly9zLmlzYW5vb2suY29tL21uLzAvdWQvMzIvMTYzOTEyL3N0ZWFrc21hbGwuanBn.jpg'
-                },
-                {
-                    key: 8,
-                    price: 20,
-                    name: {
-                        th: 'กุ้งมะนาว เปรี้ยวแซ่บ',
-                        en: 'RICE'
-                    },
-                    uri: 'http://ipattaya.co/wp-content/uploads/2016/12/DSC08017.jpg'
-                }
-            ]
 
         return (
             <Root>
@@ -484,19 +423,24 @@ export default class Product extends Component<{}> {
                     </Modal>
                     <GridView
                         itemWidth={130}
-                        items={items}
+                        items={this.state.products}
                         style={styles.gridView}
                         renderItem={item => (
-                            <TouchableOpacity onPress={() => {
+                            <TouchableOpacity key={item.product_id} onPress={() => {
                                 this.setState({dialogVisible: true})
                             }}>
                                 <View style={{ backgroundColor: 'white', borderRadius: 5, height: 220, borderColor: '#d3d3d3', borderWidth: 1}}>
                                     <View style={{ padding: 15 }}>
-                                        <Text numberOfLines={1} >{ item.name.th }</Text>
+                                        <Text numberOfLines={1} >{ item.detail }</Text>
                                     </View>
-                                    <Image style={{ width: '100%', height: 120 }} source={{ uri: item.uri }} />
+                                    {
+                                        !!item.image_path&&<Image style={{ width: '100%', height: 120 }} source={{ uri: item.image_path }} />
+                                    }
+                                    {
+                                        !item.image_path&&<Image style={{ width: '100%', height: 120 }} source={{ uri: 'http://www.biofreeze.com/media/catalog/product/cache/15/image/9df78eab33525d08d6e5fb8d27136e95/placeholder/default/ImageNotFound_3.png' }} />
+                                    }
                                     <View style={{ padding: 15 }}>
-                                        <Text style={{ color: '#4c4c4c', fontSize: 13 }}>ราคา { item.price } บาท</Text>
+                                        <Text style={{ color: '#4c4c4c', fontSize: 13 }}>ราคา { parseInt(item.sale_price) } บาท</Text>
                                     </View>
                                 </View>
                             </TouchableOpacity>

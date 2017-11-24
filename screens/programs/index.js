@@ -83,11 +83,10 @@ export default class Programs extends React.Component {
 
 	renderActivity = () => {
         const template = this.state.activity.map((activity, index) => (
-			<Button key={index} bordered block style={{ backgroundColor: 'white', borderColor: '#d3d3d3', borderBottomWidth: 0.5 }}
+			<Button key={index} bordered block style={{ backgroundColor: 'white', borderColor: '#d3d3d3', borderBottomWidth: 0.5, marginBottom: 15 }}
                 onPress={() => this.restaurant() }
 			>
 				<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 15, paddingRight: 15 }}>
-					<Icon style={{color: '#4c4c4c'}} name='md-restaurant' />
 					<Text style={{color: '#4c4c4c' }}>{ activity.app_id.toUpperCase() }</Text>
 					<Icon style={{color: '#4c4c4c'}} name='ios-arrow-forward-outline' />
 				</View>

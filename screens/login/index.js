@@ -63,8 +63,10 @@ export default class Login extends React.Component {
 
 	async onLogin() {
 		if(this.state.username && this.state.password) {
+			// itsmartone.com/bpkservice/api/user/login?username=test&password=1234
 			axios.get('http://itsmartone.com/bpkservice/api/user/login?username=' + this.state.username + '&password='+ this.state.password)
 			.then((response) => {
+				console.log(response)
 				if(response.data.success == "1") {
 					this.setState({ error: "" })
 					AsyncStorage.setItem('token',  response.data.token)

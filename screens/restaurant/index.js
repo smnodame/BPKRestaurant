@@ -109,6 +109,7 @@ export default class Restaurant extends Component<{}> {
 		return this.state.restaurants.map((restaurant) => {
 				return (
 					<Button bordered block
+						key={restaurant.section_pos_id}
                         style={{ backgroundColor: 'white', borderColor: '#d3d3d3', borderBottomWidth: 0.5, marginBottom: 15 }}
                         onPress={() => this.goToTablePage(restaurant.section_pos_id, restaurant.pos_name) }
                     >

@@ -39,7 +39,7 @@ export default class Table extends Component<{}> {
     constructor(props) {
         super(props);
         this.state = {
-            title: '',
+            pos_name: '',
             tables: []
         }
 		this.openControlPanel = this.openControlPanel.bind(this)
@@ -54,6 +54,7 @@ export default class Table extends Component<{}> {
 			AsyncStorage.getItem('section_pos_id').then((section_pos_id) => {
                 fetch(`http://itsmartone.com/pos/api/sell/table_list?token=${token}&section_pos_id=${section_pos_id}`).then((res) => res.json())
                 .then((res) => {
+                    console.log(res.data)
                     this.setState({
                         tables: res.data
                     })
@@ -196,10 +197,10 @@ export default class Table extends Component<{}> {
                         items={this.state.tables}
                         style={styles.gridView}
                         renderItem={item => (
-                            <TouchableOpacity onPress={() => this.gotoMenuPage()}>
+                            <TouchableOpacity  onPress={() => this.gotoMenuPage()}>
                                 <View style={{ backgroundColor: 'white', borderRadius: 5, height: 220, borderColor: '#d3d3d3', borderWidth: 1}}>
                                     <View style={{ padding: 15, backgroundColor: '#dfe3ee', borderTopLeftRadius: 5, borderTopRightRadius: 5 }}>
-                                        <Text numberOfLines={1} >NO { item.table_no }</Text>
+                                        <Text numberOfLines={1} >โต๊ะ { item.table_no }</Text>
                                     </View>
                                     {
                                         item.isused=='T'&&<View style={{ padding: 15 }}>
