@@ -50,6 +50,15 @@ export default class Product extends Component<{}> {
             choosed_category: {
                 id: '0',
                 name: 'ALL'
+            },
+            choosed_menu: {
+                price: '0',
+                product_name: '',
+                note: '',
+                amount: '0',
+                isFreeGift: false,
+                unit: '',
+                canEditPrice: false
             }
         }
         this.renderModalContent = this.renderModalContent.bind(this)
@@ -60,6 +69,7 @@ export default class Product extends Component<{}> {
         this.logout = this.logout.bind(this)
         this.goToRestaurantPage = this.goToRestaurantPage.bind(this)
         this.goToTablePage = this.goToTablePage.bind(this)
+        this.openOrderDialog = this.openOrderDialog.bind(this)
         // Event Listener for orientation changes
         Dimensions.addEventListener('change', () => {
             const {height, width} = Dimensions.get('window')
@@ -69,6 +79,26 @@ export default class Product extends Component<{}> {
                 this.setState({ billHeight: height*.3 })
             }
 
+        })
+    }
+
+    openOrderDialog = (product_id) => {
+        function find_product(product) {
+          return product.product_id == product_id;
+        }
+
+        const product = this.state.products.find(find_product); // 130
+        this.setState({
+            choosed_menu: {
+                price: parseInt(product.sale_price, 10).toString(),
+                product_name: product.detail,
+                note: '',
+                amount: '0',
+                isFreeGift: false,
+                unit: 'บาท / ' + product.unit_detail,
+                canEditPrice: product.editable_sale_price=="F"? false : true
+            },
+            dialogVisible: true
         })
     }
 
@@ -162,16 +192,19 @@ export default class Product extends Component<{}> {
                     title: "เลือกประเภทสินค้า (Category)"
                 },
                 buttonIndex => {
-                    const product_list = this.state.product_list.filter((product) => {
-                        return this.state.category[buttonIndex].id == product.product_cat_id
-                    })
+                    if(buttonIndex >= 0) {
+                        const product_list = this.state.product_list.filter((product) => {
+                            return this.state.category[buttonIndex].id == product.product_cat_id
+                        })
 
-                    this.setState({ choosed_category: {
-                            name: this.state.category[buttonIndex].text,
-                            id: this.state.category[buttonIndex].id,
-                        },
-                        products: product_list
-                    })
+                        this.setState({ choosed_category: {
+                                name: this.state.category[buttonIndex].text,
+                                id: this.state.category[buttonIndex].id,
+                            },
+                            products: product_list
+                        })
+                    }
+
                 }
             )
         }
@@ -275,25 +308,29 @@ export default class Product extends Component<{}> {
         <View style={styles.modalContent}>
             <View style={{ flexDirection: 'row', marginBottom: 20, justifyContent: 'center', alignItems: 'center' }}>
                 <Text numberOfLines={1}>
-                    ไก่ทอดเกลือตะไคร้
+                    {
+                        this.state.choosed_menu.product_name
+                    }
                 </Text>
                 <View style={{ flex: 1 }}/>
                 <Item regular style={[styles.textInput, { backgroundColor: 'white', width: 80 } ]}>
-                    <Input placeholderTextColor='#d4d8da' placeholder='ราคา' value={'20'} style={{ textAlign: 'center', fontSize: 22, color: '#5cb85c' }}/>
+                    <Input placeholderTextColor='#d4d8da' placeholder='ราคา' value={this.state.choosed_menu.price} style={{ textAlign: 'center', fontSize: 22, color: '#5cb85c' }}/>
                 </Item>
                 <Text style={{ paddingLeft: 20, fontSize: 22, color: '#5cb85c' }}>
-                    บาท
+                    {
+                        this.state.choosed_menu.unit
+                    }
                 </Text>
             </View>
             <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-                <Switch value={false} />
+                <Switch value={this.state.choosed_menu.isFreeGift} />
                 <Text>
                     เพิ่มเป็นของเเถม
                 </Text>
                 <View style={{ flex: 1 }}/>
             </View>
             <Item regular style={[styles.textInput, { backgroundColor: 'white', marginBottom: 10 } ]}>
-                <Input placeholderTextColor='#d4d8da' placeholder='Note'
+                <Input placeholderTextColor='#d4d8da' placeholder='Note' value={this.state.choosed_menu.note}
             />
             </Item>
             <View
@@ -311,7 +348,9 @@ export default class Product extends Component<{}> {
                     }}
                 >
                     <Text style={{ color: 'white'  }}>
-                        0
+                        {
+                            this.state.choosed_menu.amount
+                        }
                     </Text>
                 </View>
                 <Button transparent>
@@ -462,17 +501,17 @@ export default class Product extends Component<{}> {
                         style={styles.gridView}
                         renderItem={item => (
                             <TouchableOpacity key={item.product_id} onPress={() => {
-                                this.setState({dialogVisible: true})
+                                this.openOrderDialog(item.product_id)
                             }}>
                                 <View style={{ backgroundColor: 'white', borderRadius: 5, height: 220, borderColor: '#d3d3d3', borderWidth: 1}}>
                                     <View style={{ padding: 15 }}>
                                         <Text numberOfLines={1} >{ item.detail }</Text>
                                     </View>
                                     {
-                                        !!item.image_path&&<Image style={{ width: '100%', height: 120 }} source={{ uri: item.image_path }} />
+                                        !!item.image_url&&<Image style={{ width: '100%', height: 120 }} source={{ uri: item.image_url }} />
                                     }
                                     {
-                                        !item.image_path&&<Image style={{ width: '100%', height: 120 }} source={{ uri: 'http://www.biofreeze.com/media/catalog/product/cache/15/image/9df78eab33525d08d6e5fb8d27136e95/placeholder/default/ImageNotFound_3.png' }} />
+                                        !item.image_url&&<Image style={{ width: '100%', height: 120 }} source={{ uri: 'http://www.biofreeze.com/media/catalog/product/cache/15/image/9df78eab33525d08d6e5fb8d27136e95/placeholder/default/ImageNotFound_3.png' }} />
                                     }
                                     <View style={{ padding: 15 }}>
                                         <Text style={{ color: '#4c4c4c', fontSize: 13 }}>ราคา { parseInt(item.sale_price) } บาท</Text>
