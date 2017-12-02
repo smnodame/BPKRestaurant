@@ -109,15 +109,17 @@ export default class Product extends Component<{}> {
 			AsyncStorage.getItem('section_pos_id').then((section_pos_id) => {
                 fetch(`http://itsmartone.com/pos/api/sell/product_list?token=${token}&section_pos_id=${section_pos_id}`).then((res) => res.json())
                 .then((res) => {
-                    const category = res.data.product_cats.map((category) => {
-                        return {
-                            text: category.detail,
-                            icon: "md-arrow-dropright",
-                            iconColor: "#ea943b",
-                            id: category.product_cat_id
-                        }
-                    })
-                    category.push({ text: "All", icon: "md-arrow-dropright", iconColor: "#ea943b", id : "0"})
+                    const category = [
+                        { text: "All", icon: "md-arrow-dropright", iconColor: "#ea943b", id : "0"},
+                        ...res.data.product_cats.map((category) => {
+                            return {
+                                text: category.detail,
+                                icon: "md-arrow-dropright",
+                                iconColor: "#ea943b",
+                                id: category.product_cat_id
+                            }
+                        })
+                    ]
                     this.setState({
                         product_list: res.data.products,
                         category: category,
