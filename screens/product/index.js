@@ -55,9 +55,10 @@ export default class Product extends Component<{}> {
                 price: '0',
                 product_name: '',
                 note: '',
-                amount: '0',
+                amount: '1',
                 isFreeGift: false,
                 unit: '',
+                sumPrice: '0',
                 canEditPrice: false
             }
         }
@@ -93,8 +94,9 @@ export default class Product extends Component<{}> {
                 price: parseInt(product.sale_price, 10).toString(),
                 product_name: product.detail,
                 note: '',
-                amount: '0',
+                amount: '1',
                 isFreeGift: false,
+                sumPrice: parseInt(product.sale_price, 10).toString(),
                 unit: 'บาท / ' + product.unit_detail,
                 canEditPrice: product.editable_sale_price=="F"? false : true
             },
@@ -314,7 +316,21 @@ export default class Product extends Component<{}> {
                 </Text>
                 <View style={{ flex: 1 }}/>
                 <Item regular style={[styles.textInput, { backgroundColor: 'white', width: 80 } ]}>
-                    <Input placeholderTextColor='#d4d8da' placeholder='ราคา' value={this.state.choosed_menu.price} style={{ textAlign: 'center', fontSize: 22, color: '#5cb85c' }}/>
+                    <Input
+                        placeholderTextColor='#d4d8da'
+                        editable = {this.state.choosed_menu.canEditPrice}
+                        placeholder='ราคา'
+                        value={this.state.choosed_menu.sumPrice}
+                        style={{ textAlign: 'center', fontSize: 22, color: '#5cb85c' }}
+                        onChangeText={
+                            (text) => this.setState({
+                                choosed_menu: {
+                                    ...this.state.choosed_menu,
+                                    sumPrice: text
+                                }
+                            })
+                        }
+                    />
                 </Item>
                 <Text style={{ paddingLeft: 20, fontSize: 22, color: '#5cb85c' }}>
                     {
@@ -323,22 +339,56 @@ export default class Product extends Component<{}> {
                 </Text>
             </View>
             <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-                <Switch value={this.state.choosed_menu.isFreeGift} />
+                <Switch
+                    value={this.state.choosed_menu.isFreeGift}
+                    onValueChange={
+                        (status) => this.setState({
+                            choosed_menu: {
+                                ...this.state.choosed_menu,
+                                isFreeGift: status
+                            }
+                        })
+                    }
+                />
                 <Text>
                     เพิ่มเป็นของเเถม
                 </Text>
                 <View style={{ flex: 1 }}/>
             </View>
             <Item regular style={[styles.textInput, { backgroundColor: 'white', marginBottom: 10 } ]}>
-                <Input placeholderTextColor='#d4d8da' placeholder='Note' value={this.state.choosed_menu.note}
-            />
+                <Input
+                    placeholderTextColor='#d4d8da'
+                    placeholder='Note'
+                    value={this.state.choosed_menu.note}
+                    onChangeText={
+                        (text) => this.setState({
+                            choosed_menu: {
+                                ...this.state.choosed_menu,
+                                note: text
+                            }
+                        })
+                    }
+                />
             </Item>
             <View
                 style={{
                     flexDirection: 'row'
                 }}>
 
-                <Button transparent>
+                <Button transparent
+                    onPress={() => {
+                            if(parseInt(this.state.choosed_menu.amount, 10)!=1) {
+                                this.setState({
+                                    choosed_menu: {
+                                        ...this.state.choosed_menu,
+                                        amount: (parseInt(this.state.choosed_menu.amount, 10) - 1).toString(),
+                                        sumPrice: ((parseInt(this.state.choosed_menu.amount, 10) - 1) * parseInt(this.state.choosed_menu.price, 10) ).toString()
+                                    }
+                                })
+                            }
+                        }
+                    }
+                >
                     <Icon name="ios-remove-circle-outline" style={styles.icon}/>
                 </Button>
                 <View height={50} width={50}
@@ -353,7 +403,17 @@ export default class Product extends Component<{}> {
                         }
                     </Text>
                 </View>
-                <Button transparent>
+                <Button transparent
+                    onPress={() =>
+                        this.setState({
+                            choosed_menu: {
+                                ...this.state.choosed_menu,
+                                amount: (parseInt(this.state.choosed_menu.amount, 10) + 1).toString(),
+                                sumPrice: ((parseInt(this.state.choosed_menu.amount, 10) + 1) * parseInt(this.state.choosed_menu.price, 10) ).toString()
+                            }
+                        })
+                    }
+                >
                     <Icon name="ios-add-circle-outline" style={styles.icon}/>
                 </Button>
             </View>
