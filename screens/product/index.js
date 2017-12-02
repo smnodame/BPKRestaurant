@@ -71,6 +71,7 @@ export default class Product extends Component<{}> {
         this.goToRestaurantPage = this.goToRestaurantPage.bind(this)
         this.goToTablePage = this.goToTablePage.bind(this)
         this.openOrderDialog = this.openOrderDialog.bind(this)
+        this.addOrderToDraft = this.addOrderToDraft.bind(this)
         // Event Listener for orientation changes
         Dimensions.addEventListener('change', () => {
             const {height, width} = Dimensions.get('window')
@@ -91,6 +92,7 @@ export default class Product extends Component<{}> {
         const product = this.state.products.find(find_product); // 130
         this.setState({
             choosed_menu: {
+                product_id: product_id,
                 price: parseInt(product.sale_price, 10).toString(),
                 product_name: product.detail,
                 note: '',
@@ -141,6 +143,33 @@ export default class Product extends Component<{}> {
             })
         })
 	}
+
+    addOrderToDraft = () => {
+        AsyncStorage.getItem('draft_order').then((draft_order) => {
+            const value = !!draft_order? [
+                ...JSON.parse(draft_order),
+                {
+                    product_id: this.state.choosed_menu.product_id,
+                    qty: this.state.choosed_menu.amount,
+                    price: this.state.choosed_menu.sumPrice,
+                    note: this.state.choosed_menu.note,
+                    name: this.state.choosed_menu.product_name
+                }
+            ] :
+            [
+                {
+                    product_id: this.state.choosed_menu.product_id,
+                    qty: this.state.choosed_menu.amount,
+                    price: this.state.choosed_menu.sumPrice,
+                    note: this.state.choosed_menu.note,
+                    name: this.state.choosed_menu.product_name
+                }
+            ]
+            AsyncStorage.setItem('draft_order', JSON.stringify(value)).then(() => {
+                this.setState({ dialogVisible: false })
+            })
+        })
+    }
 
     logout = () => {
         const resetAction = NavigationActions.reset({
@@ -419,7 +448,7 @@ export default class Product extends Component<{}> {
                     <Icon name="ios-add-circle-outline" style={styles.icon}/>
                 </Button>
             </View>
-            <Button block success>
+            <Button block success onPress={() => this.addOrderToDraft() }>
                 <Text>ยืนยัน</Text>
             </Button>
         </View>
