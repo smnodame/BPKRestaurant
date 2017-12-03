@@ -7,7 +7,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, TouchableOpacity, Platform, Image, ScrollView, Dimensions, AsyncStorage } from 'react-native';
 import GridView from 'react-native-super-grid';
-import { Container, Header, Content, Card, CardItem, Root, ActionSheet, Text, Body, Left, Button, Label, Icon, Title, Right, Item, Switch, Input, List, ListItem, Separator  } from 'native-base';
+import { Container, Header, Content, Card, CardItem, Root, ActionSheet, Text, SwipeRow, Body, Left, Button, Label, Icon, Title, Right, Item, Switch, Input, List, ListItem, Separator  } from 'native-base';
 import PopupDialog, {
   DialogTitle,
   DialogButton,
@@ -263,19 +263,45 @@ export default class Product extends Component<{}> {
                     <ScrollView style={{ height: this.state.billHeight }}>
                     <List>
                         {
-                            this.state.pending_sale_products.map((pending_sale_product) => {
+                            this.state.pending_sale_products.map((pending_sale_product, index) => {
                                 return (
-                                    <ListItem key={ pending_sale_product.product_id } style={{ marginLeft: 0 }}>
-                                        <Body>
-                                            <Text>{ pending_sale_product.product_detail }</Text>
-                                            <Text note>{ 'x ' + parseInt(pending_sale_product.qty, 10).toString() + ' ' + pending_sale_product.unit_detail }</Text>
-                                        </Body>
-                                        <Right>
-                                            <Text style={{ fontSize: 18, color: '#5cb85c' }}>
-                                                { pending_sale_product.total_price + ' ฿'}
-                                            </Text>
-                                        </Right>
-                                    </ListItem>
+                                    <SwipeRow
+                                        rightOpenValue={-75}
+                                        body={
+                                            <View style={{ flexDirection: 'row' }}>
+                                                <View style={{ width: '70%', marginLeft: 10 }}>
+                                                    <Text style={{ textAlign: 'left', width: '100%' }} numberOfLines={1}>{ pending_sale_product.product_detail }</Text>
+                                                    <Text style={{ textAlign: 'left', width: '100%' }} note numberOfLines={1}>{ 'x ' + parseInt(pending_sale_product.qty, 10).toString() + ' ' + pending_sale_product.unit_detail }</Text>
+                                                </View>
+                                                <View style={{ flex: 1 }}>
+                                                    <Text style={{ fontSize: 18, color: '#5cb85c', textAlign: 'right', width: '100%' }}>
+                                                        { pending_sale_product.total_price + ' ฿'}
+                                                    </Text>
+                                                </View>
+                                            </View>
+                                        }
+                                        right={
+                                            <Button danger onPress={() => {
+                                                fetch('http://itsmartone.com/pos/api/sell/cancel_order',{
+                                    				method: 'POST',
+                                    				body: JSON.stringify({
+                                    					token: this.state.token,
+                                                        pending_sale_product_id: pending_sale_product.pending_sale_product_id,
+                                    				})
+                                    			})
+                                    			.then((res) => res.json())
+                                    			.then((response) => {
+                                                    this.setState({
+                                                        pending_sale_products: this.state.pending_sale_products.filter((pending_sale_product, index_2) => {
+                                                            return index_2 != index
+                                                        })
+                                                    })
+                                                })
+                                            }}>
+                                                <Icon active name="trash" />
+                                            </Button>
+                                        }
+                                    />
                                 )
                             })
                         }
@@ -365,7 +391,12 @@ export default class Product extends Component<{}> {
                             <Icon name='md-print' />
                             <Text>พิมพ์ใบสั่ง</Text>
                         </Button>
-                        <Button success>
+                        <Button success onPress={() => {
+                            this.setState({
+                                billModal: false
+                            })
+                            this.props.navigation.navigate("Bill")
+                        }}>
                             <Icon name='md-card' />
                             <Text>ชำระเงิน</Text>
                         </Button>
