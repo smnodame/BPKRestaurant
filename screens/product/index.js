@@ -39,6 +39,7 @@ export default class Product extends Component<{}> {
     constructor(props) {
         super(props)
         this.state = {
+            draft_order: [],
             dialogVisible: false,
             billModal: false,
             billHeight: height*.5,
@@ -99,7 +100,7 @@ export default class Product extends Component<{}> {
                 amount: '1',
                 isFreeGift: false,
                 sumPrice: parseInt(product.sale_price, 10).toString(),
-                unit: 'บาท / ' + product.unit_detail,
+                unit: product.unit_detail,
                 canEditPrice: product.editable_sale_price=="F"? false : true
             },
             dialogVisible: true
@@ -125,7 +126,9 @@ export default class Product extends Component<{}> {
                     this.setState({
                         product_list: res.data.products,
                         category: category,
-                        products: res.data.products.filter((product, index) => index<50)
+                        products: res.data.products.filter((product, index) => index<50),
+                        token: token,
+                        section_pos_id: section_pos_id
                     })
                 })
 			})
@@ -142,32 +145,28 @@ export default class Product extends Component<{}> {
                 table_no: 'โต๊ะ ' + table_no
             })
         })
+
+        AsyncStorage.getItem('pos_table_id').then((pos_table_id) => {
+            this.setState({
+                pos_table_id: pos_table_id
+            })
+        })
 	}
 
     addOrderToDraft = () => {
-        AsyncStorage.getItem('draft_order').then((draft_order) => {
-            const value = !!draft_order? [
-                ...JSON.parse(draft_order),
+        this.setState({
+            draft_order: [
+                ...this.state.draft_order,
                 {
                     product_id: this.state.choosed_menu.product_id,
                     qty: this.state.choosed_menu.amount,
                     price: this.state.choosed_menu.sumPrice,
                     note: this.state.choosed_menu.note,
-                    name: this.state.choosed_menu.product_name
+                    name: this.state.choosed_menu.product_name,
+                    unit: this.state.choosed_menu.unit,
                 }
-            ] :
-            [
-                {
-                    product_id: this.state.choosed_menu.product_id,
-                    qty: this.state.choosed_menu.amount,
-                    price: this.state.choosed_menu.sumPrice,
-                    note: this.state.choosed_menu.note,
-                    name: this.state.choosed_menu.product_name
-                }
-            ]
-            AsyncStorage.setItem('draft_order', JSON.stringify(value)).then(() => {
-                this.setState({ dialogVisible: false })
-            })
+            ],
+            dialogVisible: false
         })
     }
 
@@ -247,9 +246,16 @@ export default class Product extends Component<{}> {
         return (
             <View style={styles.modalContent}>
                 <View style={{ flexDirection: 'row', marginBottom: 10 }}>
-                    <Text style={{ fontSize: 20 }}>
-                        รายการที่สั่ง
-                    </Text>
+                    {
+                        this.state.draft_order.length>0&&<Text style={{ fontSize: 20 }}>
+                            รายการรอคอมเฟิร์ม
+                        </Text>
+                    }
+                    {
+                        this.state.draft_order.length==0&&<Text style={{ fontSize: 20 }}>
+                            ชำระเงิน
+                        </Text>
+                    }
                     <View style={{ flex: 1 }} />
                     <Button transparent
                     style={{ paddingBottom: 20 }}
@@ -257,82 +263,70 @@ export default class Product extends Component<{}> {
                         <Icon name='md-close' />
                     </Button>
                 </View>
-                <View style={{ width: '100%' }}>
-                    <ScrollView style={{ height: this.state.billHeight }}>
-                    <List>
-                        <ListItem style={{ marginLeft: 0 }}>
-                            <Body>
-                                <Text>กุ้งมะนาว เปรี้ยวแซ่บ</Text>
-                                <Text note>x 4 จาน</Text>
-                            </Body>
-                            <Right>
-                                <Text style={{ fontSize: 18, color: '#5cb85c' }}>
-                                    50 ฿
-                                </Text>
-                            </Right>
-                        </ListItem>
-                        <ListItem style={{ marginLeft: 0 }}>
-                            <Body>
-                                <Text>ทอดมันปลากราย </Text>
-                                <Text note>x 9 ชิ้น</Text>
-                            </Body>
-                            <Right>
-                                <Text style={{ fontSize: 18, color: '#5cb85c' }}>
-                                    150 ฿
-                                </Text>
-                            </Right>
-                        </ListItem>
-                        <ListItem style={{ marginLeft: 0 }}>
-                            <Body>
-                                <Text>ทอดมันข้าวโพดกุ้งสับ</Text>
-                                <Text note>x 1 จาน</Text>
-                            </Body>
-                            <Right>
-                                <Text style={{ fontSize: 18, color: '#5cb85c' }}>
-                                    120 ฿
-                                </Text>
-                            </Right>
-                        </ListItem>
-                        <ListItem style={{ marginLeft: 0 }}>
-                            <Body>
-                                <Text>เต้าหู้ทรงเครื่อง</Text>
-                                <Text note>x 3 ชุด</Text>
-                            </Body>
-                            <Right>
-                                <Text style={{ fontSize: 18, color: '#5cb85c' }}>
-                                    875 ฿
-                                </Text>
-                            </Right>
-                        </ListItem>
-                        <ListItem style={{ marginLeft: 0 }}>
-                            <Body>
-                                <Text>น้ำเเปปซี่</Text>
-                                <Text note>x 1 ขวด</Text>
-                            </Body>
-                            <Right>
-                                <Text style={{ fontSize: 18, color: '#5cb85c' }}>
-                                    25 ฿
-                                </Text>
-                            </Right>
-                        </ListItem>
-                    </List>
-                    </ScrollView>
-                </View>
-                <View style={{ flexDirection: 'row', marginTop: 20 }}>
-                    <Button iconLeft success style={{ marginRight: 20 }}>
-                        <Icon name='md-print' />
-                        <Text>พิมพ์ใบสั่ง</Text>
-                    </Button>
-                    <Button success onPress={() => {
-                        this.setState({
-                            billModal: false
-                        })
-                        this.props.navigation.navigate("Bill")
-                    }}>
-                        <Icon name='md-card' />
-                        <Text>ชำระเงิน</Text>
-                    </Button>
-                </View>
+                {
+                    this.state.draft_order.length>0&&<View style={{ width: '100%' }}>
+                        <ScrollView style={{ height: this.state.billHeight }}>
+                        <List>
+                            {
+                                this.state.draft_order.map((draft_order) => {
+                                    return (
+                                        <ListItem key={ draft_order.product_id } style={{ marginLeft: 0 }}>
+                                            <Body>
+                                                <Text>{ draft_order.name }</Text>
+                                                <Text note>{ 'x ' + draft_order.qty + ' ' + draft_order.unit }</Text>
+                                            </Body>
+                                            <Right>
+                                                <Text style={{ fontSize: 18, color: '#5cb85c' }}>
+                                                    { draft_order.price + ' ฿'}
+                                                </Text>
+                                            </Right>
+                                        </ListItem>
+                                    )
+                                })
+                            }
+                        </List>
+                        </ScrollView>
+                    </View>
+                }
+                {
+                    this.state.draft_order.length>0&&<View style={{ flexDirection: 'row', marginTop: 20 }}>
+                        <Button success onPress={() => {
+                            fetch('http://itsmartone.com/pos/api/sell/add_order',{
+                				method: 'POST',
+                				body: JSON.stringify({
+                					token: this.state.token,
+                                    user_id: 'system',
+                					section_pos_id: this.state.section_pos_id,
+                					pos_table_id: this.state.pos_table_id,
+                                    total_price: 0,
+                                    product_list: this.state.draft_order
+                				})
+                			})
+                			.then((res) => res.json())
+                			.then((response) => {
+                                this.setState({
+                                    draft_order: [],
+                                    billModal: false
+                                })
+                            })
+                        }}>
+                            <Icon name='md-card' />
+                            <Text>สร้างใบสั่ง</Text>
+                        </Button>
+                    </View>
+                }
+                {
+                    this.state.draft_order.length==0&&<View style={{ flexDirection: 'row', marginTop: 20 }}>
+                        <Button iconLeft success style={{ marginRight: 20 }}>
+                            <Icon name='md-print' />
+                            <Text>สร้างใบสั่ง</Text>
+                        </Button>
+                        <Button success>
+                            <Icon name='md-card' />
+                            <Text>ชำระเงิน</Text>
+                        </Button>
+                    </View>
+                }
             </View>
         )
     }

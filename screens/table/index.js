@@ -103,15 +103,17 @@ export default class Table extends Component<{}> {
         this.props.navigation.dispatch(resetAction)
     }
 
-    gotoMenuPage = (table_no) => {
-        AsyncStorage.setItem('table_no', table_no).then(() => {
-            const resetAction = NavigationActions.reset({
-                    index: 0,
-                    actions: [
-                        NavigationActions.navigate({ routeName: 'Product'})
-                    ]
-                })
-            this.props.navigation.dispatch(resetAction)
+    gotoMenuPage = (table_no, pos_table_id) => {
+        AsyncStorage.setItem('pos_table_id', pos_table_id).then(() => {
+            AsyncStorage.setItem('table_no', table_no).then(() => {
+                const resetAction = NavigationActions.reset({
+                        index: 0,
+                        actions: [
+                            NavigationActions.navigate({ routeName: 'Product'})
+                        ]
+                    })
+                this.props.navigation.dispatch(resetAction)
+            })
         })
     }
 
@@ -194,7 +196,7 @@ export default class Table extends Component<{}> {
                         items={this.state.tables}
                         style={styles.gridView}
                         renderItem={item => (
-                            <TouchableOpacity  onPress={() => this.gotoMenuPage(item.table_no)}>
+                            <TouchableOpacity  onPress={() => this.gotoMenuPage(item.table_no, item.pos_table_id)}>
                                 <View style={{ backgroundColor: 'white', borderRadius: 5, height: 220, borderColor: '#d3d3d3', borderWidth: 1}}>
                                     <View style={{ padding: 15, backgroundColor: '#dfe3ee', borderTopLeftRadius: 5, borderTopRightRadius: 5 }}>
                                         <Text numberOfLines={1} >โต๊ะ { item.table_no }</Text>
