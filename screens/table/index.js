@@ -207,7 +207,7 @@ export default class Table extends Component<{}> {
                                                 item.pending_sale_products.map((pending_product, index) => {
                                                         if(index==6) {
                                                             return (
-                                                                <Text numberOfLines={1} style={{ color: '#4c4c4c', fontSize: 13, marginBottom: 5 }}>
+                                                                <Text numberOfLines={1} style={{ color: '#4c4c4c', fontSize: 13, marginTop: -10, marginBottom: 30 }}>
                                                                     ...
                                                                 </Text>
                                                             )

@@ -42,6 +42,7 @@ export default class Product extends Component<{}> {
             draft_order: [],
             dialogVisible: false,
             billModal: false,
+            orderModal: false,
             billHeight: height*.5,
             category: [],
             product_list: [],
@@ -61,10 +62,12 @@ export default class Product extends Component<{}> {
                 unit: '',
                 sumPrice: '0',
                 canEditPrice: false
-            }
+            },
+            pending_sale_products: []
         }
         this.renderModalContent = this.renderModalContent.bind(this)
         this.renderBillModal = this.renderBillModal.bind(this)
+        this.renderOrderModal = this.renderOrderModal.bind(this)
         this.showCategoty = this.showCategoty.bind(this)
         this.openControlPanel = this.openControlPanel.bind(this)
         this.backToPrograms = this.backToPrograms.bind(this)
@@ -242,6 +245,47 @@ export default class Product extends Component<{}> {
         }
     }
 
+    renderOrderModal = () => {
+        return (
+            <View style={styles.modalContent}>
+                <View style={{ flexDirection: 'row', marginBottom: 10 }}>
+                        <Text style={{ fontSize: 20 }}>
+                            รายการที่สั่งเเล้ว
+                        </Text>
+                        <View style={{ flex: 1 }} />
+                    <Button transparent
+                    style={{ paddingBottom: 20 }}
+                    onPress={() => this.setState({ orderModal: false })}>
+                        <Icon name='md-close' />
+                    </Button>
+                </View>
+                <View style={{ width: '100%' }}>
+                    <ScrollView style={{ height: this.state.billHeight }}>
+                    <List>
+                        {
+                            this.state.pending_sale_products.map((pending_sale_product) => {
+                                return (
+                                    <ListItem key={ pending_sale_product.product_id } style={{ marginLeft: 0 }}>
+                                        <Body>
+                                            <Text>{ pending_sale_product.product_detail }</Text>
+                                            <Text note>{ 'x ' + parseInt(pending_sale_product.qty, 10).toString() + ' ' + pending_sale_product.unit_detail }</Text>
+                                        </Body>
+                                        <Right>
+                                            <Text style={{ fontSize: 18, color: '#5cb85c' }}>
+                                                { pending_sale_product.total_price + ' ฿'}
+                                            </Text>
+                                        </Right>
+                                    </ListItem>
+                                )
+                            })
+                        }
+                    </List>
+                    </ScrollView>
+                </View>
+            </View>
+        )
+    }
+
     renderBillModal = () => {
         return (
             <View style={styles.modalContent}>
@@ -319,7 +363,7 @@ export default class Product extends Component<{}> {
                     this.state.draft_order.length==0&&<View style={{ flexDirection: 'row', marginTop: 20 }}>
                         <Button iconLeft success style={{ marginRight: 20 }}>
                             <Icon name='md-print' />
-                            <Text>สร้างใบสั่ง</Text>
+                            <Text>พิมพ์ใบสั่ง</Text>
                         </Button>
                         <Button success>
                             <Icon name='md-card' />
@@ -558,6 +602,24 @@ export default class Product extends Component<{}> {
                 </Header>
                 <Content>
                     <Header style={{ backgroundColor: '#3b5998' }}>
+                        <Body>
+                            <Button transparent light
+                                onPress={() => {
+                                        fetch(`http://itsmartone.com/pos/api/sell/pos_table_product_list?token=${this.state.token}&section_pos_id=${this.state.section_pos_id}&pos_table_id=${this.state.pos_table_id}`)
+                                        .then((res) => res.json())
+                                        .then((response) => {
+                                            console.log(response)
+                                            this.setState({
+                                                pending_sale_products: response.data.products,
+                                                orderModal: true
+                                            })
+                                        })
+                                    }
+                                }
+                            >
+                                <Text>รายการที่สั่งไปเเล้ว</Text>
+                            </Button>
+                        </Body>
                         <Right>
                             <Button iconRight transparent
                                 onPress={() => this.showCategoty() }>
@@ -572,6 +634,7 @@ export default class Product extends Component<{}> {
                         </Right>
                     </Header>
                     <Modal isVisible={this.state.billModal}>{this.renderBillModal()}</Modal>
+                    <Modal isVisible={this.state.orderModal}>{this.renderOrderModal()}</Modal>
                     <Modal isVisible={this.state.dialogVisible}
                     onBackdropPress={() => this.setState({dialogVisible: false})}
                     style={{
