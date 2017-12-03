@@ -203,9 +203,25 @@ export default class Table extends Component<{}> {
                                     </View>
                                     {
                                         item.isused=='T'&&<View style={{ padding: 15 }}>
-                                            <Text numberOfLines={1} style={{ color: '#4c4c4c', fontSize: 13, marginBottom: 5 }}>กระเพรากุ้ง x 100 (สั่ง)</Text>
-                                            <Text numberOfLines={1} style={{ color: '#4c4c4c', fontSize: 13, marginBottom: 5 }}>กระเพราหมู x 2 (สั่ง)</Text>
-                                            <Text numberOfLines={1} style={{ color: '#4c4c4c', fontSize: 13, marginBottom: 5 }}>ส้มตำ x 1 (สั่ง)</Text>
+                                            {
+                                                item.pending_sale_products.map((pending_product, index) => {
+                                                        if(index==6) {
+                                                            return (
+                                                                <Text numberOfLines={1} style={{ color: '#4c4c4c', fontSize: 13, marginBottom: 5 }}>
+                                                                    ...
+                                                                </Text>
+                                                            )
+                                                        } else {
+                                                            return (
+                                                                <Text numberOfLines={1} style={{ color: '#4c4c4c', fontSize: 13, marginBottom: 5 }}>
+                                                                    {
+                                                                        pending_product.product_detail + ' x ' + parseInt(pending_product.qty, 10).toString()
+                                                                    }
+                                                                </Text>
+                                                            )
+                                                        }
+                                                })
+                                            }
                                         </View>
                                     }
                                     {
