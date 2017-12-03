@@ -167,6 +167,7 @@ export default class Product extends Component<{}> {
                     note: this.state.choosed_menu.note,
                     name: this.state.choosed_menu.product_name,
                     unit: this.state.choosed_menu.unit,
+                    is_free: this.state.choosed_menu.isFreeGift
                 }
             ],
             dialogVisible: false
@@ -266,6 +267,7 @@ export default class Product extends Component<{}> {
                             this.state.pending_sale_products.map((pending_sale_product, index) => {
                                 return (
                                     <SwipeRow
+                                        key={pending_sale_product.pending_sale_product_id}
                                         rightOpenValue={-75}
                                         body={
                                             <View style={{ flexDirection: 'row' }}>
@@ -338,19 +340,36 @@ export default class Product extends Component<{}> {
                         <ScrollView style={{ height: this.state.billHeight }}>
                         <List>
                             {
-                                this.state.draft_order.map((draft_order) => {
+                                this.state.draft_order.map((draft_order, index) => {
                                     return (
-                                        <ListItem key={ draft_order.product_id } style={{ marginLeft: 0 }}>
-                                            <Body>
-                                                <Text>{ draft_order.name }</Text>
-                                                <Text note>{ 'x ' + draft_order.qty + ' ' + draft_order.unit }</Text>
-                                            </Body>
-                                            <Right>
-                                                <Text style={{ fontSize: 18, color: '#5cb85c' }}>
-                                                    { draft_order.price + ' ฿'}
-                                                </Text>
-                                            </Right>
-                                        </ListItem>
+                                        <SwipeRow
+                                            key={ draft_order.product_id }
+                                            rightOpenValue={-75}
+                                            body={
+                                                <View style={{ flexDirection: 'row' }}>
+                                                    <View style={{ width: '70%', marginLeft: 10 }}>
+                                                        <Text style={{ textAlign: 'left', width: '100%' }} numberOfLines={1}>{ draft_order.name }</Text>
+                                                        <Text style={{ textAlign: 'left', width: '100%' }} note numberOfLines={1}>{ 'x ' + parseInt(draft_order.qty, 10).toString() + ' ' + draft_order.unit }</Text>
+                                                    </View>
+                                                    <View style={{ flex: 1 }}>
+                                                        <Text style={{ fontSize: 18, color: '#5cb85c', textAlign: 'right', width: '100%' }}>
+                                                            { draft_order.price + ' ฿'}
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                            }
+                                            right={
+                                                <Button danger onPress={() => {
+                                                    this.setState({
+                                                        draft_order: this.state.draft_order.filter((draft_order, index_2) => {
+                                                            return index_2 != index
+                                                        })
+                                                    })
+                                                }}>
+                                                    <Icon active name="trash" />
+                                                </Button>
+                                            }
+                                        />
                                     )
                                 })
                             }
@@ -368,7 +387,9 @@ export default class Product extends Component<{}> {
                                     user_id: 'system',
                 					section_pos_id: this.state.section_pos_id,
                 					pos_table_id: this.state.pos_table_id,
-                                    total_price: 0,
+                                    total_price: this.state.draft_order.reduce((o, n) => {
+                                        return o + n.price
+                                    }, 0),
                                     product_list: this.state.draft_order
                 				})
                 			})
@@ -387,15 +408,25 @@ export default class Product extends Component<{}> {
                 }
                 {
                     this.state.draft_order.length==0&&<View style={{ flexDirection: 'row', marginTop: 20 }}>
-                        <Button iconLeft success style={{ marginRight: 20 }}>
-                            <Icon name='md-print' />
-                            <Text>พิมพ์ใบสั่ง</Text>
-                        </Button>
                         <Button success onPress={() => {
-                            this.setState({
-                                billModal: false
+                            fetch('http://itsmartone.com/pos/api/sell/checkout',{
+                				method: 'POST',
+                				body: JSON.stringify({
+                					token: this.state.token,
+                					section_pos_id: this.state.section_pos_id,
+                					pos_table_id: this.state.pos_table_id
+                				})
+                			})
+                			.then((res) => res.json())
+                			.then((response) => {
+                                const resetAction = NavigationActions.reset({
+                                    index: 0,
+                                    actions: [
+                                        NavigationActions.navigate({ routeName: 'Table'})
+                                    ]
+                                })
+                                this.props.navigation.dispatch(resetAction)
                             })
-                            this.props.navigation.navigate("Bill")
                         }}>
                             <Icon name='md-card' />
                             <Text>ชำระเงิน</Text>
