@@ -51,7 +51,8 @@ export default class Product extends Component<{}> {
             pos_name: '',
             choosed_category: {
                 id: '0',
-                name: 'ALL'
+                name: 'ALL',
+                index: 0
             },
             choosed_menu: {
                 price: '0',
@@ -63,7 +64,9 @@ export default class Product extends Component<{}> {
                 sumPrice: '0',
                 canEditPrice: false
             },
-            pending_sale_products: []
+            pending_sale_products: [],
+            limit: 2,
+            isShowLoadMore: false
         }
         this.renderModalContent = this.renderModalContent.bind(this)
         this.renderBillModal = this.renderBillModal.bind(this)
@@ -76,6 +79,7 @@ export default class Product extends Component<{}> {
         this.goToTablePage = this.goToTablePage.bind(this)
         this.openOrderDialog = this.openOrderDialog.bind(this)
         this.addOrderToDraft = this.addOrderToDraft.bind(this)
+        this.loadMore = this.loadMore.bind(this)
         // Event Listener for orientation changes
         Dimensions.addEventListener('change', () => {
             const {height, width} = Dimensions.get('window')
@@ -129,10 +133,10 @@ export default class Product extends Component<{}> {
                     this.setState({
                         product_list: res.data.products,
                         category: category,
-                        products: res.data.products.filter((product, index) => index<50),
                         token: token,
                         section_pos_id: section_pos_id
                     })
+                    this.loadMore()
                 })
 			})
 		})
@@ -155,6 +159,26 @@ export default class Product extends Component<{}> {
             })
         })
 	}
+
+    loadMore = () => {
+        const filter_by_category = this.state.product_list.filter((product, index) => {
+            if(this.state.choosed_category.index > 0) {
+                return (this.state.category[this.state.choosed_category.index].id == product.product_cat_id)
+            } else {
+                return true
+            }
+        })
+
+        const filter_by_limit = filter_by_category.filter((product, index) => {
+            return index < (this.state.limit + this.state.products.length)
+        })
+
+        this.setState({
+            products: filter_by_limit,
+            isShowLoadMore: filter_by_limit.length < filter_by_category.length
+        })
+
+    }
 
     addOrderToDraft = () => {
         this.setState({
@@ -229,18 +253,26 @@ export default class Product extends Component<{}> {
                 },
                 buttonIndex => {
                     if(buttonIndex >= 0) {
-                        const product_list = this.state.product_list.filter((product) => {
-                            return this.state.category[buttonIndex].id == product.product_cat_id
+                        const filter_by_category = this.state.product_list.filter((product, index) => {
+                            if(buttonIndex > 0) {
+                                return (this.state.category[buttonIndex].id == product.product_cat_id)
+                            } else {
+                                return true
+                            }
                         })
 
+                        const filter_by_limit = filter_by_category.filter((product, index) => {
+                            return index < this.state.limit
+                        })
                         this.setState({ choosed_category: {
                                 name: this.state.category[buttonIndex].text,
                                 id: this.state.category[buttonIndex].id,
+                                index: buttonIndex
                             },
-                            products: product_list
+                            products: filter_by_limit,
+                            isShowLoadMore: filter_by_limit.length < filter_by_category.length
                         })
                     }
-
                 }
             )
         }
@@ -730,6 +762,17 @@ export default class Product extends Component<{}> {
                             </TouchableOpacity>
                         )}
                     />
+                    {
+                        this.state.isShowLoadMore&&<View>
+                            <Button
+                                transparent
+                                style={{ justifyContent: 'center', alignItems: 'center' }}
+                                onPress={() => this.loadMore() }
+                            >
+                                <Text>Load More</Text>
+                            </Button>
+                        </View>
+                    }
                 </Content>
             </Container>
             </Drawer>
