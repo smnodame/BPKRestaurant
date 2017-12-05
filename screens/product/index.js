@@ -762,17 +762,15 @@ export default class Product extends Component<{}> {
                             <TouchableOpacity key={item.product_id} onPress={() => {
                                 this.openOrderDialog(item.product_id)
                             }}>
-                                <View style={{ backgroundColor: 'white', borderRadius: 5, height: 220, borderColor: '#d3d3d3', borderWidth: 1}}>
-                                    <View style={{ padding: 15 }}>
-                                        <Text numberOfLines={1} >{ item.detail }</Text>
-                                    </View>
+                                <View style={{ backgroundColor: 'white', borderRadius: 5, height: 220, borderColor: '#d3d3d3', borderWidth: 1, position: 'relative'}}>
+                                    <Text style={{ width: '100%', position: 'absolute', top: 0, borderTopLeftRadius: 5, borderTopRightRadius: 5, padding: 15, zIndex: 999, backgroundColor: 'rgba(0,0,0,0.1)' }}>{ item.detail }</Text>
                                     {
-                                        !!item.image_url&&<Image style={{ width: '100%', height: 120 }} source={{ uri: item.image_url }} />
+                                        !!item.image_url&&<Image style={{ width: '100%', height: 120, position: 'absolute', top: 0, marginTop: 57  }} source={{ uri: item.image_url }} />
                                     }
                                     {
-                                        !item.image_url&&<Image style={{ width: '100%', height: 120 }} source={{ uri: 'http://www.biofreeze.com/media/catalog/product/cache/15/image/9df78eab33525d08d6e5fb8d27136e95/placeholder/default/ImageNotFound_3.png' }} />
+                                        !item.image_url&&<Image style={{ width: '100%', height: 120, position: 'absolute', top: 0, marginTop: 40 }} source={{ uri: 'http://www.biofreeze.com/media/catalog/product/cache/15/image/9df78eab33525d08d6e5fb8d27136e95/placeholder/default/ImageNotFound_3.png' }} />
                                     }
-                                    <View style={{ padding: 15 }}>
+                                    <View style={{ padding: 15, position: 'absolute', bottom: 0 }}>
                                         <Text style={{ color: '#4c4c4c', fontSize: 13 }}>ราคา { parseInt(item.sale_price) } บาท</Text>
                                     </View>
                                 </View>
