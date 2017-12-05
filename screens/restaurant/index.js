@@ -9,6 +9,7 @@ import { StyleSheet, View, Platform, Image, Dimensions, AsyncStorage } from 'rea
 import GridView from 'react-native-super-grid';
 import {
 	Content,
+	Spinner,
 	Text,
 	List,
 	ListItem,
@@ -41,7 +42,8 @@ export default class Restaurant extends Component<{}> {
     constructor(props) {
         super(props);
         this.state = {
-			restaurants: []
+			restaurants: [],
+			isLoading: true
         }
 		this.openControlPanel = this.openControlPanel.bind(this)
         this.backToPrograms = this.backToPrograms.bind(this)
@@ -57,7 +59,8 @@ export default class Restaurant extends Component<{}> {
 				.then((res) => res.json())
 				.then((res) => {
 					this.setState({
-						restaurants: res.data
+						restaurants: res.data,
+						isLoading: false
 					})
 				})
 			})
@@ -190,6 +193,12 @@ export default class Restaurant extends Component<{}> {
 					{
 						this.rendetRestaurant()
 					}
+					{
+                        this.state.isLoading&&<View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                            <Spinner color='red' />
+                            <Text style={{ textAlign: 'center', color: '#d4d8da', marginTop: 5, fontSize: 20 }}>Loading...</Text>
+                        </View>
+                    }
                 </Content>
             </Container>
         </Drawer>

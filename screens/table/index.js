@@ -8,6 +8,7 @@
  import GridView from 'react-native-super-grid';
  import {
  	Content,
+    Spinner,
  	Text,
  	List,
  	ListItem,
@@ -40,7 +41,8 @@ export default class Table extends Component<{}> {
         super(props);
         this.state = {
             pos_name: '',
-            tables: []
+            tables: [],
+            isLoading: true
         }
 		this.openControlPanel = this.openControlPanel.bind(this)
         this.backToPrograms = this.backToPrograms.bind(this)
@@ -56,7 +58,8 @@ export default class Table extends Component<{}> {
                 .then((res) => {
                     console.log(res.data)
                     this.setState({
-                        tables: res.data
+                        tables: res.data,
+                        isLoading: false
                     })
                 })
 			})
@@ -233,6 +236,12 @@ export default class Table extends Component<{}> {
                             </TouchableOpacity>
                         )}
                     />
+                    {
+                        this.state.isLoading&&<View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                            <Spinner color='red' />
+                            <Text style={{ textAlign: 'center', color: '#d4d8da', marginTop: 5, fontSize: 20 }}>Loading...</Text>
+                        </View>
+                    }
                 </Content>
             </Container>
         </Drawer>
