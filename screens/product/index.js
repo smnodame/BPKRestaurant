@@ -385,7 +385,7 @@ export default class Product extends Component<{}> {
                                                     </View>
                                                     <View style={{ flex: 1 }}>
                                                         <Text style={{ fontSize: 18, color: '#5cb85c', textAlign: 'right', width: '100%' }}>
-                                                            { draft_order.price + ' ฿'}
+                                                            { (parseInt(draft_order.price, 0) * parseInt(draft_order.qty, 10)).toString() + ' ฿'}
                                                         </Text>
                                                     </View>
                                                 </View>
@@ -543,7 +543,7 @@ export default class Product extends Component<{}> {
                                     choosed_menu: {
                                         ...this.state.choosed_menu,
                                         amount: (parseInt(this.state.choosed_menu.amount, 10) - 1).toString(),
-                                        sumPrice: ((parseInt(this.state.choosed_menu.amount, 10) - 1) * parseInt(this.state.choosed_menu.price, 10) ).toString()
+                                        sumPrice: this.state.choosed_menu.price
                                     }
                                 })
                             }
@@ -570,7 +570,7 @@ export default class Product extends Component<{}> {
                             choosed_menu: {
                                 ...this.state.choosed_menu,
                                 amount: (parseInt(this.state.choosed_menu.amount, 10) + 1).toString(),
-                                sumPrice: ((parseInt(this.state.choosed_menu.amount, 10) + 1) * parseInt(this.state.choosed_menu.price, 10) ).toString()
+                                sumPrice: this.state.choosed_menu.price
                             }
                         })
                     }
