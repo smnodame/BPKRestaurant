@@ -109,13 +109,7 @@ export default class Table extends Component<{}> {
     gotoMenuPage = (table_no, pos_table_id) => {
         AsyncStorage.setItem('pos_table_id', pos_table_id).then(() => {
             AsyncStorage.setItem('table_no', table_no).then(() => {
-                const resetAction = NavigationActions.reset({
-                        index: 0,
-                        actions: [
-                            NavigationActions.navigate({ routeName: 'Product'})
-                        ]
-                    })
-                this.props.navigation.dispatch(resetAction)
+                this.props.navigation.navigate('Product')
             })
         })
     }

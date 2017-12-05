@@ -65,13 +65,7 @@ export default class Programs extends React.Component {
     }
 
     restaurant = () => {
-        const resetAction = NavigationActions.reset({
-                index: 0,
-                actions: [
-                    NavigationActions.navigate({ routeName: 'Restaurant'})
-                ]
-            })
-        this.props.navigation.dispatch(resetAction)
+        this.props.navigation.navigate('Restaurant')
     }
 
 	async componentWillMount() {
