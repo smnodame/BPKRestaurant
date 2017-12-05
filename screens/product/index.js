@@ -472,33 +472,31 @@ export default class Product extends Component<{}> {
     renderModalContent = () => (
         <View style={styles.modalContent}>
             <View style={{ flexDirection: 'row', marginBottom: 20, justifyContent: 'center', alignItems: 'center' }}>
-                <Text numberOfLines={1}>
-                    {
-                        this.state.choosed_menu.product_name
+            <Text style={{ width: '60%' }}>
+                {
+                    this.state.choosed_menu.product_name
+                }
+            </Text>
+            <View style={{ flex: 1 }}/>
+            <Item regular style={[styles.textInput, { backgroundColor: 'white', width: 70 } ]}>
+                <Input
+                    placeholderTextColor='#d4d8da'
+                    editable = {this.state.choosed_menu.canEditPrice}
+                    placeholder='ราคา'
+                    value={this.state.choosed_menu.sumPrice}
+                    style={{ textAlign: 'center', fontSize: 18, color: '#5cb85c' }}
+                    onChangeText={
+                        (text) => this.setState({
+                            choosed_menu: {
+                                ...this.state.choosed_menu,
+                                sumPrice: text
+                            }
+                        })
                     }
-                </Text>
-                <View style={{ flex: 1 }}/>
-                <Item regular style={[styles.textInput, { backgroundColor: 'white', width: 80 } ]}>
-                    <Input
-                        placeholderTextColor='#d4d8da'
-                        editable = {this.state.choosed_menu.canEditPrice}
-                        placeholder='ราคา'
-                        value={this.state.choosed_menu.sumPrice}
-                        style={{ textAlign: 'center', fontSize: 22, color: '#5cb85c' }}
-                        onChangeText={
-                            (text) => this.setState({
-                                choosed_menu: {
-                                    ...this.state.choosed_menu,
-                                    sumPrice: text
-                                }
-                            })
-                        }
-                    />
-                </Item>
-                <Text style={{ paddingLeft: 20, fontSize: 22, color: '#5cb85c' }}>
-                    {
-                        this.state.choosed_menu.unit
-                    }
+                />
+            </Item>
+                <Text style={{ paddingLeft: 12, fontSize: 16, color: '#5cb85c' }}>
+                    บาท
                 </Text>
             </View>
             <View style={{ flexDirection: 'row', marginBottom: 20 }}>
@@ -556,7 +554,7 @@ export default class Product extends Component<{}> {
                 </Button>
                 <View height={50} width={50}
                     style={{
-                        backgroundColor: '#5cb85c', borderRadius: 25, marginBottom: 20,
+                        backgroundColor: '#5cb85c', borderRadius: 25,
                         flexDirection: 'row', justifyContent: 'center', alignItems: 'center'
                     }}
                 >
@@ -580,6 +578,11 @@ export default class Product extends Component<{}> {
                     <Icon name="ios-add-circle-outline" style={styles.icon}/>
                 </Button>
             </View>
+            <Text style={{ fontSize: 15, color: '#5cb85c', width: '100%', textAlign: 'center', marginTop: 5, marginBottom: 5 }}>
+                {
+                    this.state.choosed_menu.unit
+                }
+            </Text>
             <Button block success onPress={() => this.addOrderToDraft() }>
                 <Text>ยืนยัน</Text>
             </Button>
