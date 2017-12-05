@@ -7,7 +7,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, TouchableOpacity, Platform, Image, ScrollView, Dimensions, AsyncStorage } from 'react-native';
 import GridView from 'react-native-super-grid';
-import { Container, Header, Content, Card, CardItem, Root, ActionSheet, Text, SwipeRow, Body, Left, Button, Label, Icon, Title, Right, Item, Switch, Input, List, ListItem, Separator  } from 'native-base';
+import { Container, Spinner, Header, Content, Card, CardItem, Root, ActionSheet, Text, SwipeRow, Body, Left, Button, Label, Icon, Title, Right, Item, Switch, Input, List, ListItem, Separator  } from 'native-base';
 import PopupDialog, {
   DialogTitle,
   DialogButton,
@@ -66,7 +66,9 @@ export default class Product extends Component<{}> {
             },
             pending_sale_products: [],
             limit: 2,
-            isShowLoadMore: false
+            isShowLoadMore: false,
+            isLoading: true,
+            isLoadMoreProcess: false
         }
         this.renderModalContent = this.renderModalContent.bind(this)
         this.renderBillModal = this.renderBillModal.bind(this)
@@ -137,6 +139,9 @@ export default class Product extends Component<{}> {
                         section_pos_id: section_pos_id
                     })
                     this.loadMore()
+                    this.setState({
+                        isLoading: false
+                    })
                 })
 			})
 		})
@@ -161,6 +166,9 @@ export default class Product extends Component<{}> {
 	}
 
     loadMore = () => {
+        this.setState({
+            isLoadMoreProcess: true
+        })
         const filter_by_category = this.state.product_list.filter((product, index) => {
             if(this.state.choosed_category.index > 0) {
                 return (this.state.category[this.state.choosed_category.index].id == product.product_cat_id)
@@ -175,7 +183,8 @@ export default class Product extends Component<{}> {
 
         this.setState({
             products: filter_by_limit,
-            isShowLoadMore: filter_by_limit.length < filter_by_category.length
+            isShowLoadMore: filter_by_limit.length < filter_by_category.length,
+            isLoadMoreProcess: false
         })
 
     }
@@ -766,13 +775,26 @@ export default class Product extends Component<{}> {
                         )}
                     />
                     {
-                        this.state.isShowLoadMore&&<View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                        this.state.isShowLoadMore&&!this.state.isLoadMoreProcess&&<View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                             <Button
                                 transparent
                                 onPress={() => this.loadMore() }
                             >
                                 <Text>Load More</Text>
                             </Button>
+                        </View>
+                    }
+
+                    {
+                        this.state.isLoadMoreProcess&&<View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                            <Spinner color='red' />
+                        </View>
+                    }
+
+                    {
+                        this.state.isLoading&&<View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                            <Spinner color='red' />
+                            <Text style={{ textAlign: 'center', color: '#d4d8da', marginTop: 5, fontSize: 20 }}>Loading...</Text>
                         </View>
                     }
                 </Content>
