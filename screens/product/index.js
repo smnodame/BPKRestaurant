@@ -5,7 +5,7 @@
  */
 
 import React, { Component } from 'react';
-import { StyleSheet, View, TouchableOpacity, Platform, Image, ScrollView, Dimensions, AsyncStorage } from 'react-native';
+import { StyleSheet, BackHandler, View, TouchableOpacity, Platform, Image, ScrollView, Dimensions, AsyncStorage } from 'react-native';
 import GridView from 'react-native-super-grid';
 import { Container, Spinner, Header, Content, Card, CardItem, Root, ActionSheet, Text, SwipeRow, Body, Left, Button, Label, Icon, Title, Right, Item, Switch, Input, List, ListItem, Separator  } from 'native-base';
 import PopupDialog, {
@@ -163,7 +163,16 @@ export default class Product extends Component<{}> {
                 pos_table_id: pos_table_id
             })
         })
+       //
+    //     BackHandler.addEventListener('hardwareBackPress', function() {
+    //         console.log('========== true ')
+    //        return true
+    //    }.bind(this))
 	}
+
+    componentWillUnmount() {
+        // BackHandler.removeEventListener('hardwareBackPress');
+    }
 
     loadMore = () => {
         this.setState({
@@ -602,11 +611,6 @@ export default class Product extends Component<{}> {
 
     }
 
-    componentWillUnmount() {
-
-    }
-
-
     render() {
 
         return (
@@ -742,6 +746,7 @@ export default class Product extends Component<{}> {
                     <Modal isVisible={this.state.billModal}>{this.renderBillModal()}</Modal>
                     <Modal isVisible={this.state.orderModal}>{this.renderOrderModal()}</Modal>
                     <Modal isVisible={this.state.dialogVisible}
+                    onRequestClose={() => this.setState({dialogVisible: false})}
                     onBackdropPress={() => this.setState({dialogVisible: false})}
                     style={{
                         justifyContent: 'flex-end',
