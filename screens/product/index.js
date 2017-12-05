@@ -763,10 +763,9 @@ export default class Product extends Component<{}> {
                         )}
                     />
                     {
-                        this.state.isShowLoadMore&&<View>
+                        this.state.isShowLoadMore&&<View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                             <Button
                                 transparent
-                                style={{ justifyContent: 'center', alignItems: 'center' }}
                                 onPress={() => this.loadMore() }
                             >
                                 <Text>Load More</Text>
