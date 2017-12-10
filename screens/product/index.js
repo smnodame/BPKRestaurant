@@ -745,24 +745,9 @@ export default class Product extends Component<{}> {
                                 <Button transparent light
                                     onPress={() => {
                                             this.setState({
+                                                pending_sale_products: [],
                                                 orderModal: true,
-                                                pending_order_loading: true,
-                                                pending_sale_products: []
-                                            })
-                                            fetch(`${this.state.pos_host}/api/sell/pos_table_product_list?token=${this.state.token}&section_pos_id=${this.state.section_pos_id}&pos_table_id=${this.state.pos_table_id}`)
-                                            .then((res) => res.json())
-                                            .then((response) => {
-                                                this.setState({
-                                                    pending_order_loading: false,
-                                                    pending_sale_products: response.data.products
-                                                })
-                                            }, (err) => {
-
-                                            }).catch(() => {
-                                                this.setState({
-                                                    pending_order_loading: false,
-                                                    pending_sale_products: []
-                                                })
+                                                pending_order_loading: true
                                             })
                                         }
                                     }
@@ -784,7 +769,24 @@ export default class Product extends Component<{}> {
                             </Right>
                         </Header>
                         <Modal isVisible={this.state.billModal}>{this.renderBillModal()}</Modal>
-                        <Modal isVisible={this.state.orderModal}>{this.renderOrderModal()}</Modal>
+                        <Modal onModalShow={() => {
+                            fetch(`${this.state.pos_host}/api/sell/pos_table_product_list?token=${this.state.token}&section_pos_id=${this.state.section_pos_id}&pos_table_id=${this.state.pos_table_id}`)
+                            .then((res) => res.json())
+                            .then((response) => {
+                                this.setState({
+                                    pending_order_loading: false,
+                                    pending_sale_products: response.data.products
+                                })
+                            }, (err) => {
+
+                            }).catch(() => {
+                                this.setState({
+                                    pending_order_loading: false,
+                                    pending_sale_products: []
+                                })
+                            })
+                        }}
+                        isVisible={this.state.orderModal}>{this.renderOrderModal()}</Modal>
                         <Modal isVisible={this.state.dialogVisible}
                         onRequestClose={() => this.setState({dialogVisible: false})}
                         onBackdropPress={() => this.setState({dialogVisible: false})}
