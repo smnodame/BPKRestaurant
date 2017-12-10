@@ -54,7 +54,7 @@ export default class Product extends Component<{}> {
                 isFreeGift: false,
                 unit: '',
                 sumPrice: '0',
-                canEditPrice: false
+                editable_sale_price: false
             },
             pending_sale_products: [],
             limit: 50,
@@ -107,7 +107,7 @@ export default class Product extends Component<{}> {
                 isFreeGift: false,
                 sumPrice: parseInt(product.sale_price, 10).toString(),
                 unit: product.unit_detail,
-                canEditPrice: product.editable_sale_price=="F"? false : true
+                editable_sale_price: product.editable_sale_price=="F"? false : true
             },
             dialogVisible: true
         })
@@ -497,7 +497,7 @@ export default class Product extends Component<{}> {
             <Item regular style={[styles.textInput, { backgroundColor: 'white', width: 70 } ]}>
                 <Input
                     placeholderTextColor='#d4d8da'
-                    editable = {this.state.choosed_menu.canEditPrice}
+                    editable = {this.state.choosed_menu.editable_sale_price}
                     placeholder='ราคา'
                     value={this.state.choosed_menu.sumPrice}
                     style={{ textAlign: 'center', fontSize: 18, color: '#5cb85c' }}
@@ -522,7 +522,8 @@ export default class Product extends Component<{}> {
                         (status) => this.setState({
                             choosed_menu: {
                                 ...this.state.choosed_menu,
-                                isFreeGift: status
+                                isFreeGift: status,
+                                sumPrice: status? '0' : this.state.choosed_menu.price
                             }
                         })
                     }
