@@ -102,7 +102,14 @@ export default class Restaurant extends Component<{}> {
 		.then(() => {
 			AsyncStorage.setItem('pos_name',  pos_name)
 			.then(() => {
-				this.props.navigation.navigate('Table')
+				const resetAction = NavigationActions.reset({
+		                index: 1,
+		                actions: [
+		                    NavigationActions.navigate({ routeName: 'Restaurant'}),
+							NavigationActions.navigate({ routeName: 'Table'})
+		                ]
+		            })
+		        this.props.navigation.dispatch(resetAction)
 			})
 		})
 	}
