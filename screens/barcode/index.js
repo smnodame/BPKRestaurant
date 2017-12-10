@@ -27,7 +27,7 @@ import {
 	Keyboard
 } from "native-base";
 import { NavigationActions } from 'react-navigation'
-import BarcodeScanner from 'react-native-barcode-scanner-google';
+import Camera from 'react-native-camera';
 
 import axios from "axios"
 const deviceHeight = Dimensions.get("window").height
@@ -41,6 +41,7 @@ export default class Barcode extends React.Component {
 			round: 0,
             torchMode: 'off',
             cameraType: 'back',
+			 qrcode: ''
         }
     }
 
@@ -53,48 +54,52 @@ export default class Barcode extends React.Component {
 		})
     }
 
-    _handleBarCodeRead = ({ type, data }) => {
-        console.log(type)
-        console.log(data)
-        console.log('=================')
-		// const hn = data
-		// if(this.state.round == 0) {
-		// 	this.setState({ round: 1 })
-		// 	axios.get(this.state.patient_host + '/api/patient/get_patient_data?token='+ this.state.token + '&hn=' + hn)
-		// 	.then((response) => {
-		// 		if( response.data.success == "1" ) {
-		// 			const resetAction = NavigationActions.reset({
-		// 	            index: 1,
-		// 	            actions: [
-		// 	                NavigationActions.navigate({ routeName: 'Patient' }),
-		// 	                NavigationActions.navigate({ routeName: 'Personal', params: { hn: hn }  })
-		// 	            ]
-		// 	        })
-		// 	        this.props.navigation.dispatch(resetAction);
-		// 		} else {
-		// 			Alert.alert(
-		// 			'ผลการค้นหา',
-		// 			'ไม่พบผู้ป่วย HN : ' + hn,
-		// 				[
-		// 					{text: 'ยกเลิก', onPress: () => this.props.navigation.dispatch(NavigationActions.back()), style: 'cancel'},
-		// 					{text: 'ค้นหาใหม่', onPress: () => this.setState({ round: 0 })}
-		// 				],
-		// 				{
-		// 					cancelable: false
-		// 				}
-		// 			)
-		// 		}
-		// 	})
-		// }
+    _handleBarCodeRead = (e) => {
+		const hn = e.data
+		if(this.state.round == 0) {
+			this.setState({ round: 1 })
+			axios.get(this.state.patient_host + '/api/patient/get_patient_data?token='+ this.state.token + '&hn=' + hn)
+			.then((response) => {
+				if( response.data.success == "1" ) {
+					const resetAction = NavigationActions.reset({
+			            index: 1,
+			            actions: [
+			                NavigationActions.navigate({ routeName: 'Patient' }),
+			                NavigationActions.navigate({ routeName: 'Personal', params: { hn: hn }  })
+			            ]
+			        })
+			        this.props.navigation.dispatch(resetAction);
+				} else {
+					Alert.alert(
+					'ผลการค้นหา',
+					'ไม่พบผู้ป่วย HN : ' + hn,
+						[
+							{text: 'ยกเลิก', onPress: () => this.props.navigation.dispatch(NavigationActions.back()), style: 'cancel'},
+							{text: 'ค้นหาใหม่', onPress: () => this.setState({ round: 0 })}
+						],
+						{
+							cancelable: false
+						}
+					)
+				}
+			})
+		}
     }
 
     render() {
         return (
             <View style={{ flex: 1 }}>
-				<BarcodeScanner
-					onBarCodeRead={this._handleBarCodeRead}
-					style={StyleSheet.absoluteFill}
-				/>
+			<Camera
+				onBarCodeRead={this._handleBarCodeRead}
+				style={StyleSheet.absoluteFill}
+				ref={cam => this.camera = cam}
+				aspect={Camera.constants.Aspect.fill}
+				type={Camera.constants.Type.back}
+			>
+			<Text style={{
+			                            backgroundColor: 'white'
+			                        }}>{this.state.qrcode}</Text>
+			</Camera>
 				<View style={styles.header}>
 					<View style={{ borderColor: 'orange', borderWidth: 2, height: 300, width: 300}}>
 					</View>
