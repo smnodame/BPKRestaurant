@@ -71,6 +71,13 @@ export default class Login extends React.Component {
 			default_host = await AsyncStorage.setItem('default_host', 'http://192.168.13.31/bpkservice')
 		}
 		this.setState({ isReady: true, default_host: default_host })
+
+		const token = await AsyncStorage.getItem('token')
+		if(token) {
+			
+		} else {
+			await AsyncStorage.setItem('current_state', 'Login')
+		}
     }
 
 	openControlPanel = () => {
