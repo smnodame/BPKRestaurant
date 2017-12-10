@@ -42,7 +42,8 @@ export default class Table extends Component<{}> {
         this.state = {
             pos_name: '',
             tables: [],
-            isLoading: true
+            isLoading: true,
+            isReady: false
         }
 		this.openControlPanel = this.openControlPanel.bind(this)
         this.backToPrograms = this.backToPrograms.bind(this)
@@ -51,35 +52,39 @@ export default class Table extends Component<{}> {
         this.goToRestaurantPage = this.goToRestaurantPage.bind(this)
     }
 
-    componentDidMount = () => {
-		AsyncStorage.getItem('token').then((token) => {
-			AsyncStorage.getItem('section_pos_id').then((section_pos_id) => {
-                fetch(`http://itsmartone.com/pos/api/sell/table_list?token=${token}&section_pos_id=${section_pos_id}`).then((res) => res.json())
-                .then((res) => {
-                    console.log(res.data)
-                    this.setState({
-                        tables: res.data,
-                        isLoading: false
-                    })
-                })
-			})
-		})
+    async componentWillMount() {
+        this.setState({ isReady: true })
+    }
 
-        AsyncStorage.getItem('pos_name').then((pos_name) => {
-			this.setState({
-                pos_name: pos_name
-            })
-		})
+    async componentDidMount() {
+        const pos_host = await AsyncStorage.getItem('pos_host')
+        this.setState({ pos_host : pos_host })
+
+		const token = await AsyncStorage.getItem('token')
+		const section_pos_id = await AsyncStorage.getItem('section_pos_id')
+        const res = await fetch(`${this.state.pos_host}/api/sell/table_list?token=${token}&section_pos_id=${section_pos_id}`)
+        const res_json = await res.json()
+        this.setState({
+            tables: res_json.data,
+            isLoading: false
+        })
+
+        const pos_name = await AsyncStorage.getItem('pos_name')
+		this.setState({
+            pos_name: pos_name
+        })
 	}
 
     logout = () => {
-        const resetAction = NavigationActions.reset({
-        	index: 0,
-        	actions: [
-        		NavigationActions.navigate({ routeName: 'Login'})
-        	]
+        AsyncStorage.removeItem('token').then(() => {
+            const resetAction = NavigationActions.reset({
+                    index: 0,
+                    actions: [
+                        NavigationActions.navigate({ routeName: 'Login'})
+                    ]
+                })
+                this.props.navigation.dispatch(resetAction)
         })
-        this.props.navigation.dispatch(resetAction)
 	}
 
     goToRestaurantPage = () => {
@@ -100,7 +105,7 @@ export default class Table extends Component<{}> {
         const resetAction = NavigationActions.reset({
                 index: 0,
                 actions: [
-                    NavigationActions.navigate({ routeName: 'Programs'})
+                    NavigationActions.navigate({ routeName: 'ChooseProgram'})
                 ]
             })
         this.props.navigation.dispatch(resetAction)
@@ -147,6 +152,17 @@ export default class Table extends Component<{}> {
   									</Text>
   								</Left>
   							</ListItem>
+                            <ListItem itemHeader first style={{ paddingBottom: 3 }}>
+								<Text>SETTING</Text>
+							</ListItem>
+							<ListItem button noBorder onPress={() => 	this.props.navigation.navigate('Config') }>
+								<Left>
+									<Icon active name='settings' style={{ color: "#777", fontSize: 26, width: 30 }} />
+									<Text style={styles.text}>
+										Configuration
+									</Text>
+								</Left>
+							</ListItem>
   							<ListItem itemHeader first style={{ paddingBottom: 3 }}>
   								<Text>ACCOUNT</Text>
   							</ListItem>
@@ -163,6 +179,8 @@ export default class Table extends Component<{}> {
   				</Container>
   	        }
   	    >
+        {
+            this.state.isReady?
             <Container style={{ backgroundColor: '#f4f4f4' }}>
                 <Header style={{ backgroundColor: '#3b5998' }}>
                   <Left>
@@ -236,8 +254,16 @@ export default class Table extends Component<{}> {
                             <Text style={{ textAlign: 'center', color: '#d4d8da', marginTop: 5, fontSize: 20 }}>Loading...</Text>
                         </View>
                     }
+                    {
+                        !this.state.isLoading&&this.state.tables.length == 0&&<View>
+                            <Text style={{ textAlign: 'center', color: '#d4d8da', marginTop: 20, fontSize: 20 }}>ไม่พบข้อมูล</Text>
+                        </View>
+                    }
                 </Content>
             </Container>
+            :
+            <Container />
+        }
         </Drawer>
       );
   }

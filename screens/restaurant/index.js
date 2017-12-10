@@ -6,7 +6,6 @@
 
 import React, { Component } from 'react';
 import { StyleSheet, View, Platform, Image, Dimensions, AsyncStorage } from 'react-native';
-import GridView from 'react-native-super-grid';
 import {
 	Content,
 	Spinner,
@@ -43,39 +42,41 @@ export default class Restaurant extends Component<{}> {
         super(props);
         this.state = {
 			restaurants: [],
-			isLoading: true
+			isLoading: true,
+			isReady: false
         }
 		this.openControlPanel = this.openControlPanel.bind(this)
         this.backToPrograms = this.backToPrograms.bind(this)
         this.logout = this.logout.bind(this)
 		this.rendetRestaurant = this.rendetRestaurant.bind(this)
 		this.goToTablePage = this.goToTablePage.bind(this)
+		AsyncStorage.setItem('current_state', 'Restaurant')
     }
 
-	componentDidMount = () => {
-		AsyncStorage.getItem('token').then((token) => {
-			AsyncStorage.getItem('password').then((password) => {
-				fetch(`http://itsmartone.com/pos/api/user/pos_list?token=${token}&emp_id=system&password=${password}`)
-				.then((res) => res.json())
-				.then((res) => {
-					this.setState({
-						restaurants: res.data,
-						isLoading: false
-					})
-				})
-			})
-		})
+	async componentDidMount() {
+		const pos_host = await AsyncStorage.getItem('pos_host')
+        this.setState({ pos_host : pos_host })
 
+		const token = await AsyncStorage.getItem('token')
+		const password = await AsyncStorage.getItem('password')
+		const res = await fetch(`${this.state.pos_host}/api/user/pos_list?token=${token}&emp_id=system&password=${password}`)
+		const res_json = await res.json()
+		this.setState({
+			restaurants: res_json.data,
+			isLoading: false
+		})
 	}
 
     logout = () => {
-        const resetAction = NavigationActions.reset({
-        	index: 0,
-        	actions: [
-        		NavigationActions.navigate({ routeName: 'Login'})
-        	]
-        })
-        this.props.navigation.dispatch(resetAction)
+		AsyncStorage.removeItem('token').then(() => {
+			const resetAction = NavigationActions.reset({
+					index: 0,
+					actions: [
+						NavigationActions.navigate({ routeName: 'Login'})
+					]
+				})
+				this.props.navigation.dispatch(resetAction)
+		})
 	}
 
     openControlPanel = () => {
@@ -86,10 +87,14 @@ export default class Restaurant extends Component<{}> {
         const resetAction = NavigationActions.reset({
                 index: 0,
                 actions: [
-                    NavigationActions.navigate({ routeName: 'Programs'})
+                    NavigationActions.navigate({ routeName: 'ChooseProgram'})
                 ]
             })
         this.props.navigation.dispatch(resetAction)
+    }
+
+	async componentWillMount() {
+        this.setState({ isReady: true })
     }
 
 	goToTablePage = (section_pos_id, pos_name) => {
@@ -156,6 +161,17 @@ export default class Restaurant extends Component<{}> {
   									</Text>
   								</Left>
   							</ListItem>
+							<ListItem itemHeader first style={{ paddingBottom: 3 }}>
+								<Text>SETTING</Text>
+							</ListItem>
+							<ListItem button noBorder onPress={() => 	this.props.navigation.navigate('Config') }>
+								<Left>
+									<Icon active name='settings' style={{ color: "#777", fontSize: 26, width: 30 }} />
+									<Text style={styles.text}>
+										Configuration
+									</Text>
+								</Left>
+							</ListItem>
   							<ListItem itemHeader first style={{ paddingBottom: 3 }}>
   								<Text>ACCOUNT</Text>
   							</ListItem>
@@ -172,6 +188,8 @@ export default class Restaurant extends Component<{}> {
   				</Container>
   	        }
   	    >
+		{
+			this.state.isReady?
             <Container style={{ backgroundColor: '#f4f4f4' }}>
                 <Header style={{ backgroundColor: '#3b5998' }}>
                     <Left>
@@ -195,6 +213,9 @@ export default class Restaurant extends Component<{}> {
                     }
                 </Content>
             </Container>
+			:
+			<Container />
+		}
         </Drawer>
       );
   }

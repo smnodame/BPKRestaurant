@@ -46,7 +46,7 @@ const datas = [
 	}
 ];
 
-export default class Programs extends React.Component {
+export default class ChooseProgram extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -60,12 +60,9 @@ export default class Programs extends React.Component {
 		Keyboard.dismiss()
 		this.openControlPanel = this.openControlPanel.bind(this)
 		this.logout = this.logout.bind(this)
-		this.restaurant = this.restaurant.bind(this)
+		this.changePage = this.changePage.bind(this)
 		this.renderActivity = this.renderActivity.bind(this)
-    }
-
-    restaurant = () => {
-        this.props.navigation.navigate('Restaurant')
+		AsyncStorage.setItem('current_state', 'ChooseProgram')
     }
 
 	async componentWillMount() {
@@ -76,16 +73,25 @@ export default class Programs extends React.Component {
     }
 
 	renderActivity = () => {
-        const template = this.state.activity.map((activity, index) => (
-			<Button key={index} bordered block style={{ backgroundColor: 'white', borderColor: '#d3d3d3', borderBottomWidth: 0.5, marginBottom: 15 }}
-                onPress={() => this.restaurant() }
+        const template = this.state.activity.map((activity, index) => {
+			AsyncStorage.getItem(activity.app_id+'_host').then((host) => {
+				if(host) {
+
+				} else {
+					AsyncStorage.setItem(activity.app_id+'_host', activity.base_url).then(() => {
+
+					})
+				}
+			})
+			return (<Button key={index} bordered block style={{ backgroundColor: 'white', borderColor: '#d3d3d3', borderBottomWidth: 0.5, marginBottom: 15 }}
+                onPress={() => this.changePage(activity.app_id.toLowerCase()) }
 			>
 				<View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 15, paddingRight: 15 }}>
 					<Text style={{color: '#4c4c4c' }}>{ activity.app_id.toUpperCase() }</Text>
 					<Icon style={{color: '#4c4c4c'}} name='ios-arrow-forward-outline' />
 				</View>
-			</Button>
-        ))
+			</Button>)
+		})
         return template
     }
 
@@ -94,8 +100,7 @@ export default class Programs extends React.Component {
 	}
 
 	logout = () => {
-		AsyncStorage.removeItem('token')
-		.then(() => {
+		AsyncStorage.removeItem('token').then(() => {
 			const resetAction = NavigationActions.reset({
 					index: 0,
 					actions: [
@@ -104,6 +109,27 @@ export default class Programs extends React.Component {
 				})
 				this.props.navigation.dispatch(resetAction)
 		})
+	}
+
+	changePage = (app_id) => {
+		if(app_id == 'patient') {
+			const resetAction = NavigationActions.reset({
+	                index: 0,
+	                actions: [
+	                    NavigationActions.navigate({ routeName: 'Patient'})
+	                ]
+	            })
+	    		this.props.navigation.dispatch(resetAction)
+		} else if(app_id == 'pos') {
+			const resetAction = NavigationActions.reset({
+	                index: 0,
+	                actions: [
+	                    NavigationActions.navigate({ routeName: 'Restaurant'})
+	                ]
+	            })
+	    		this.props.navigation.dispatch(resetAction)
+		}
+
 	}
 
     render() {
@@ -135,6 +161,17 @@ export default class Programs extends React.Component {
 									<Icon active name='home' style={{ color: "#777", fontSize: 26, width: 30 }} />
 									<Text style={styles.text}>
 										เลือกโปรเเกรม
+									</Text>
+								</Left>
+							</ListItem>
+							<ListItem itemHeader first style={{ paddingBottom: 3 }}>
+								<Text>SETTING</Text>
+							</ListItem>
+							<ListItem button noBorder onPress={() => 	this.props.navigation.navigate('Config') }>
+								<Left>
+									<Icon active name='settings' style={{ color: "#777", fontSize: 26, width: 30 }} />
+									<Text style={styles.text}>
+										Configuration
 									</Text>
 								</Left>
 							</ListItem>

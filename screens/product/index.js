@@ -8,15 +8,7 @@ import React, { Component } from 'react';
 import { StyleSheet, BackHandler, View, TouchableOpacity, Platform, Image, ScrollView, Dimensions, AsyncStorage } from 'react-native';
 import GridView from 'react-native-super-grid';
 import { Container, Spinner, Header, Content, Card, CardItem, Root, ActionSheet, Text, SwipeRow, Body, Left, Button, Label, Icon, Title, Right, Item, Switch, Input, List, ListItem, Separator  } from 'native-base';
-import PopupDialog, {
-  DialogTitle,
-  DialogButton,
-  SlideAnimation,
-  ScaleAnimation,
-  FadeAnimation,
-} from 'react-native-popup-dialog';
 import Modal from 'react-native-modal';
-import { Dialog, ConfirmDialog } from 'react-native-simple-dialogs';
 
 import Drawer from 'react-native-drawer'
 import { NavigationActions } from 'react-navigation'
@@ -65,10 +57,11 @@ export default class Product extends Component<{}> {
                 canEditPrice: false
             },
             pending_sale_products: [],
-            limit: 2,
+            limit: 50,
             isShowLoadMore: false,
             isLoading: true,
-            isLoadMoreProcess: false
+            isLoadMoreProcess: false,
+            isReady: false
         }
         this.renderModalContent = this.renderModalContent.bind(this)
         this.renderBillModal = this.renderBillModal.bind(this)
@@ -94,6 +87,10 @@ export default class Product extends Component<{}> {
         })
     }
 
+    async componentWillMount() {
+        this.setState({ isReady: true })
+    }
+
     openOrderDialog = (product_id) => {
         function find_product(product) {
           return product.product_id == product_id;
@@ -117,34 +114,38 @@ export default class Product extends Component<{}> {
     }
 
     componentDidMount = () => {
-		AsyncStorage.getItem('token').then((token) => {
-			AsyncStorage.getItem('section_pos_id').then((section_pos_id) => {
-                fetch(`http://itsmartone.com/pos/api/sell/product_list?token=${token}&section_pos_id=${section_pos_id}`).then((res) => res.json())
-                .then((res) => {
-                    const category = [
-                        { text: "All", icon: "md-arrow-dropright", iconColor: "#ea943b", id : "0"},
-                        ...res.data.product_cats.map((category) => {
-                            return {
-                                text: category.detail,
-                                icon: "md-arrow-dropright",
-                                iconColor: "#ea943b",
-                                id: category.product_cat_id
-                            }
+        AsyncStorage.getItem('pos_host').then((pos_host) => {
+            this.setState({ pos_host : pos_host })
+
+    		AsyncStorage.getItem('token').then((token) => {
+    			AsyncStorage.getItem('section_pos_id').then((section_pos_id) => {
+                    fetch(`${this.state.pos_host}/api/sell/product_list?token=${token}&section_pos_id=${section_pos_id}`).then((res) => res.json())
+                    .then((res) => {
+                        const category = [
+                            { text: "All", icon: "md-arrow-dropright", iconColor: "#ea943b", id : "0"},
+                            ...res.data.product_cats.map((category) => {
+                                return {
+                                    text: category.detail,
+                                    icon: "md-arrow-dropright",
+                                    iconColor: "#ea943b",
+                                    id: category.product_cat_id
+                                }
+                            })
+                        ]
+                        this.setState({
+                            product_list: res.data.products,
+                            category: category,
+                            token: token,
+                            section_pos_id: section_pos_id
                         })
-                    ]
-                    this.setState({
-                        product_list: res.data.products,
-                        category: category,
-                        token: token,
-                        section_pos_id: section_pos_id
+                        this.loadMore()
+                        this.setState({
+                            isLoading: false
+                        })
                     })
-                    this.loadMore()
-                    this.setState({
-                        isLoading: false
-                    })
-                })
-			})
-		})
+    			})
+    		})
+        })
 
         AsyncStorage.getItem('pos_name').then((pos_name) => {
 			this.setState({
@@ -163,11 +164,6 @@ export default class Product extends Component<{}> {
                 pos_table_id: pos_table_id
             })
         })
-       //
-    //     BackHandler.addEventListener('hardwareBackPress', function() {
-    //         console.log('========== true ')
-    //        return true
-    //    }.bind(this))
 	}
 
     componentWillUnmount() {
@@ -217,13 +213,15 @@ export default class Product extends Component<{}> {
     }
 
     logout = () => {
-        const resetAction = NavigationActions.reset({
-        	index: 0,
-        	actions: [
-        		NavigationActions.navigate({ routeName: 'Login'})
-        	]
+        AsyncStorage.removeItem('token').then(() => {
+            const resetAction = NavigationActions.reset({
+                    index: 0,
+                    actions: [
+                        NavigationActions.navigate({ routeName: 'Login'})
+                    ]
+                })
+                this.props.navigation.dispatch(resetAction)
         })
-        this.props.navigation.dispatch(resetAction)
 	}
 
     goToRestaurantPage = () => {
@@ -254,7 +252,7 @@ export default class Product extends Component<{}> {
         const resetAction = NavigationActions.reset({
                 index: 0,
                 actions: [
-                    NavigationActions.navigate({ routeName: 'Programs'})
+                    NavigationActions.navigate({ routeName: 'ChooseProgram'})
                 ]
             })
         this.props.navigation.dispatch(resetAction)
@@ -270,7 +268,7 @@ export default class Product extends Component<{}> {
                     title: "เลือกประเภทสินค้า (Category)"
                 },
                 buttonIndex => {
-                    if(buttonIndex >= 0) {
+                    if(buttonIndex >= 0 && buttonIndex < this.state.category.length) {
                         const filter_by_category = this.state.product_list.filter((product, index) => {
                             if(buttonIndex > 0) {
                                 return (this.state.category[buttonIndex].id == product.product_cat_id)
@@ -334,7 +332,7 @@ export default class Product extends Component<{}> {
                                         }
                                         right={
                                             <Button danger onPress={() => {
-                                                fetch('http://itsmartone.com/pos/api/sell/cancel_order',{
+                                                fetch(`${this.state.pos_host}/api/sell/cancel_order`, {
                                     				method: 'POST',
                                     				body: JSON.stringify({
                                     					token: this.state.token,
@@ -430,7 +428,7 @@ export default class Product extends Component<{}> {
                 {
                     this.state.draft_order.length>0&&<View style={{ flexDirection: 'row', marginTop: 20 }}>
                         <Button success onPress={() => {
-                            fetch('http://itsmartone.com/pos/api/sell/add_order',{
+                            fetch(`${this.state.pos_host}/api/sell/add_order`, {
                 				method: 'POST',
                 				body: JSON.stringify({
                 					token: this.state.token,
@@ -459,7 +457,7 @@ export default class Product extends Component<{}> {
                 {
                     this.state.draft_order.length==0&&<View style={{ flexDirection: 'row', marginTop: 20 }}>
                         <Button success onPress={() => {
-                            fetch('http://itsmartone.com/pos/api/sell/checkout',{
+                            fetch(`${this.state.pos_host}/api/sell/checkout`, {
                 				method: 'POST',
                 				body: JSON.stringify({
                 					token: this.state.token,
@@ -645,6 +643,17 @@ export default class Product extends Component<{}> {
     									</Text>
     								</Left>
     							</ListItem>
+                                <ListItem itemHeader first style={{ paddingBottom: 3 }}>
+    								<Text>SETTING</Text>
+    							</ListItem>
+    							<ListItem button noBorder onPress={() => 	this.props.navigation.navigate('Config') }>
+    								<Left>
+    									<Icon active name='settings' style={{ color: "#777", fontSize: 26, width: 30 }} />
+    									<Text style={styles.text}>
+    										Configuration
+    									</Text>
+    								</Left>
+    							</ListItem>
     							<ListItem itemHeader first style={{ paddingBottom: 3 }}>
     								<Text>ACCOUNT</Text>
     							</ListItem>
@@ -661,147 +670,155 @@ export default class Product extends Component<{}> {
     				</Container>
     	        }
     	    >
-            <Container style={{ backgroundColor: '#f4f4f4' }}>
-                <Header style={{ backgroundColor: '#3b5998' }}>
-                    <Left>
-                        <Button transparent onPress={() => this.openControlPanel()}>
-                            <Icon name="md-menu" />
-                        </Button>
-                    </Left>
-                    <Body style={{ flex: 3, flexDirection: 'row'}}>
-                        <Text style={{
-                                color: 'white',
-                                marginRight: 6,
-                                paddingTop: 8,
-                                paddingBottom: 8,
-                                flex: 1
-                            }}
-                            numberOfLines={1}
-                            onPress={() => this.goToRestaurantPage() }
-
-                        >
-                            { this.state.pos_name }
-                        </Text>
-                        <Text style={{
-                                color: 'white',
-                                marginRight: 6,
-                                paddingTop: 8,
-                                paddingBottom: 8
-                            }}>
-                            >
-                        </Text>
-                        <Text style={{
-                                color: 'white',
-                                marginRight: 6,
-                                paddingTop: 8,
-                                paddingBottom: 8,
-                                flex: 1
-                            }}
-                            numberOfLines={1}
-                            onPress={() => this.goToTablePage() }
-
-                        >
-                            { this.state.table_no }
-                        </Text>
-                    </Body>
-                    <Right>
-                        <Button transparent onPress={() => this.setState({ billModal: true })}>
-                            <Icon name="md-clipboard" />
-                        </Button>
-                    </Right>
-                </Header>
-                <Content>
+            {
+                this.state.isReady?
+                <Container style={{ backgroundColor: '#f4f4f4' }}>
+                    {
+                        Platform.OS != 'ios'&&<View style={styles.statusBar} />
+                    }
                     <Header style={{ backgroundColor: '#3b5998' }}>
-                        <Body>
-                            <Button transparent light
-                                onPress={() => {
-                                        fetch(`http://itsmartone.com/pos/api/sell/pos_table_product_list?token=${this.state.token}&section_pos_id=${this.state.section_pos_id}&pos_table_id=${this.state.pos_table_id}`)
-                                        .then((res) => res.json())
-                                        .then((response) => {
-                                            console.log(response)
-                                            this.setState({
-                                                pending_sale_products: response.data.products,
-                                                orderModal: true
-                                            })
-                                        })
-                                    }
-                                }
-                            >
-                                <Text>รายการที่สั่งไปเเล้ว</Text>
+                        <Left>
+                            <Button transparent onPress={() => this.openControlPanel()}>
+                                <Icon name="md-menu" />
                             </Button>
+                        </Left>
+                        <Body style={{ flex: 3, flexDirection: 'row'}}>
+                            <Text style={{
+                                    color: 'white',
+                                    marginRight: 6,
+                                    paddingTop: 8,
+                                    paddingBottom: 8,
+                                    flex: 1
+                                }}
+                                numberOfLines={1}
+                                onPress={() => this.goToRestaurantPage() }
+
+                            >
+                                { this.state.pos_name }
+                            </Text>
+                            <Text style={{
+                                    color: 'white',
+                                    marginRight: 6,
+                                    paddingTop: 8,
+                                    paddingBottom: 8
+                                }}>
+                                >
+                            </Text>
+                            <Text style={{
+                                    color: 'white',
+                                    marginRight: 6,
+                                    paddingTop: 8,
+                                    paddingBottom: 8,
+                                    flex: 1
+                                }}
+                                numberOfLines={1}
+                                onPress={() => this.goToTablePage() }
+
+                            >
+                                { this.state.table_no }
+                            </Text>
                         </Body>
                         <Right>
-                            <Button iconRight transparent
-                                onPress={() => this.showCategoty() }>
-                                <Text style={{ color: 'white' }}>
-                                    {
-                                        this.state.choosed_category.name
-                                    }
-                                </Text>
-                                <Icon name="md-arrow-dropdown" />
+                            <Button transparent onPress={() => this.setState({ billModal: true })}>
+                                <Icon name="md-clipboard" />
                             </Button>
-                            <ActionSheet ref={(c) => { this.actionSheet = c }} />
                         </Right>
                     </Header>
-                    <Modal isVisible={this.state.billModal}>{this.renderBillModal()}</Modal>
-                    <Modal isVisible={this.state.orderModal}>{this.renderOrderModal()}</Modal>
-                    <Modal isVisible={this.state.dialogVisible}
-                    onRequestClose={() => this.setState({dialogVisible: false})}
-                    onBackdropPress={() => this.setState({dialogVisible: false})}
-                    style={{
-                        justifyContent: 'flex-end',
-                        margin: 0,
-                    }}>
-                        {this.renderModalContent() }
-                    </Modal>
-                    <GridView
-                        itemWidth={130}
-                        items={this.state.products}
-                        style={styles.gridView}
-                        renderItem={item => (
-                            <TouchableOpacity key={item.product_id} onPress={() => {
-                                this.openOrderDialog(item.product_id)
-                            }}>
-                                <View style={{ backgroundColor: 'white', borderRadius: 5, height: 220, borderColor: '#d3d3d3', borderWidth: 1, position: 'relative'}}>
-                                    <Text style={{ width: '100%', position: 'absolute', top: 0, borderTopLeftRadius: 5, borderTopRightRadius: 5, padding: 15, zIndex: 999, backgroundColor: 'rgba(0,0,0,0.1)' }}>{ item.detail }</Text>
-                                    {
-                                        !!item.image_url&&<Image style={{ width: '100%', height: 120, position: 'absolute', top: 0, marginTop: 57  }} source={{ uri: item.image_url }} />
+                    <Content>
+                        <Header style={{ backgroundColor: '#3b5998' }}>
+                            <Body>
+                                <Button transparent light
+                                    onPress={() => {
+                                            fetch(`${this.state.pos_host}/api/sell/pos_table_product_list?token=${this.state.token}&section_pos_id=${this.state.section_pos_id}&pos_table_id=${this.state.pos_table_id}`)
+                                            .then((res) => res.json())
+                                            .then((response) => {
+                                                console.log(response)
+                                                this.setState({
+                                                    pending_sale_products: response.data.products,
+                                                    orderModal: true
+                                                })
+                                            })
+                                        }
                                     }
-                                    {
-                                        !item.image_url&&<Image style={{ width: '100%', height: 120, position: 'absolute', top: 0, marginTop: 40 }} source={{ uri: 'http://www.biofreeze.com/media/catalog/product/cache/15/image/9df78eab33525d08d6e5fb8d27136e95/placeholder/default/ImageNotFound_3.png' }} />
-                                    }
-                                    <View style={{ padding: 15, position: 'absolute', bottom: 0 }}>
-                                        <Text style={{ color: '#4c4c4c', fontSize: 13 }}>ราคา { parseInt(item.sale_price) } บาท</Text>
+                                >
+                                    <Text>รายการที่สั่งไปเเล้ว</Text>
+                                </Button>
+                            </Body>
+                            <Right>
+                                <Button iconRight transparent
+                                    onPress={() => this.showCategoty() }>
+                                    <Text style={{ color: 'white' }}>
+                                        {
+                                            this.state.choosed_category.name
+                                        }
+                                    </Text>
+                                    <Icon name="md-arrow-dropdown" />
+                                </Button>
+                                <ActionSheet ref={(c) => { this.actionSheet = c }} />
+                            </Right>
+                        </Header>
+                        <Modal isVisible={this.state.billModal}>{this.renderBillModal()}</Modal>
+                        <Modal isVisible={this.state.orderModal}>{this.renderOrderModal()}</Modal>
+                        <Modal isVisible={this.state.dialogVisible}
+                        onRequestClose={() => this.setState({dialogVisible: false})}
+                        onBackdropPress={() => this.setState({dialogVisible: false})}
+                        style={{
+                            justifyContent: 'flex-end',
+                            margin: 0,
+                        }}>
+                            {this.renderModalContent() }
+                        </Modal>
+                        <GridView
+                            itemWidth={130}
+                            items={this.state.products}
+                            style={styles.gridView}
+                            renderItem={item => (
+                                <TouchableOpacity key={item.product_id} onPress={() => {
+                                    this.openOrderDialog(item.product_id)
+                                }}>
+                                    <View style={{ backgroundColor: 'white', borderRadius: 5, height: 220, borderColor: '#d3d3d3', borderWidth: 1, position: 'relative'}}>
+                                        <Text style={{ width: '100%', position: 'absolute', top: 0, borderTopLeftRadius: 5, borderTopRightRadius: 5, padding: 15, zIndex: 999, backgroundColor: 'rgba(0,0,0,0.1)' }}>{ item.detail }</Text>
+                                        {
+                                            !!item.image_url&&<Image style={{ width: '100%', height: 120, position: 'absolute', top: 0, marginTop: 57  }} source={{ uri: item.image_url }} />
+                                        }
+                                        {
+                                            !item.image_url&&<Image style={{ width: '100%', height: 120, position: 'absolute', top: 0, marginTop: 40 }} source={{ uri: 'http://www.biofreeze.com/media/catalog/product/cache/15/image/9df78eab33525d08d6e5fb8d27136e95/placeholder/default/ImageNotFound_3.png' }} />
+                                        }
+                                        <View style={{ padding: 15, position: 'absolute', bottom: 0 }}>
+                                            <Text style={{ color: '#4c4c4c', fontSize: 13 }}>ราคา { parseInt(item.sale_price) } บาท</Text>
+                                        </View>
                                     </View>
-                                </View>
-                            </TouchableOpacity>
-                        )}
-                    />
-                    {
-                        this.state.isShowLoadMore&&!this.state.isLoadMoreProcess&&<View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                            <Button
-                                transparent
-                                onPress={() => this.loadMore() }
-                            >
-                                <Text>Load More</Text>
-                            </Button>
-                        </View>
-                    }
+                                </TouchableOpacity>
+                            )}
+                        />
+                        {
+                            this.state.isShowLoadMore&&!this.state.isLoadMoreProcess&&<View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                                <Button
+                                    transparent
+                                    onPress={() => this.loadMore() }
+                                >
+                                    <Text>Load More</Text>
+                                </Button>
+                            </View>
+                        }
 
-                    {
-                        this.state.isLoadMoreProcess&&<View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                            <Spinner color='red' />
-                        </View>
-                    }
+                        {
+                            this.state.isLoadMoreProcess&&<View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                                <Spinner color='red' />
+                            </View>
+                        }
 
-                    {
-                        this.state.isLoading&&<View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                            <Spinner color='red' />
-                            <Text style={{ textAlign: 'center', color: '#d4d8da', marginTop: 5, fontSize: 20 }}>Loading...</Text>
-                        </View>
-                    }
-                </Content>
-            </Container>
+                        {
+                            this.state.isLoading&&<View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                                <Spinner color='red' />
+                                <Text style={{ textAlign: 'center', color: '#d4d8da', marginTop: 5, fontSize: 20 }}>Loading...</Text>
+                            </View>
+                        }
+                    </Content>
+                </Container>
+                :
+                <Container/>
+            }
             </Drawer>
             </Root>
         );

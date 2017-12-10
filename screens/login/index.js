@@ -57,16 +57,30 @@ export default class Login extends React.Component {
 		this.onLogin = this.onLogin.bind(this)
     }
 
+	async componentDidMount() {
+
+    }
+
+	async componentWillMount() {
+		let default_host = await AsyncStorage.getItem('default_host')
+
+		const host = await AsyncStorage.getItem('default_host')
+		if(host) {
+
+		} else {
+			default_host = await AsyncStorage.setItem('default_host', 'http://192.168.13.31/bpkservice')
+		}
+		this.setState({ isReady: true, default_host: default_host })
+    }
+
 	openControlPanel = () => {
 		this._drawer.open()
 	}
 
 	async onLogin() {
 		if(this.state.username && this.state.password) {
-			// itsmartone.com/bpkservice/api/user/login?username=test&password=1234
-			axios.get('http://itsmartone.com/bpkservice/api/user/login?username=' + this.state.username + '&password='+ this.state.password)
+			axios.get(this.state.default_host + '/api/user/login?username=' + this.state.username + '&password='+ this.state.password)
 			.then((response) => {
-				console.log(response)
 				if(response.data.success == "1") {
 					this.setState({ error: "" })
 					AsyncStorage.setItem('token',  response.data.token)
@@ -76,7 +90,7 @@ export default class Login extends React.Component {
 								const resetAction = NavigationActions.reset({
 										index: 0,
 										actions: [
-											NavigationActions.navigate({ routeName: 'Programs'})
+											NavigationActions.navigate({ routeName: 'ChooseProgram'})
 										]
 									})
 								this.props.navigation.dispatch(resetAction)
@@ -91,10 +105,6 @@ export default class Login extends React.Component {
 			this.setState({ error: 'กรุณาระบุ Username เเละ Password' })
 		}
 	}
-
-    async componentWillMount() {
-        this.setState({ isReady: true })
-    }
 
     render() {
     return (
@@ -125,6 +135,17 @@ export default class Login extends React.Component {
 									<Icon active name='lock' style={{ color: "#777", fontSize: 26, width: 30 }} />
 									<Text style={styles.text}>
 										Log In
+									</Text>
+								</Left>
+							</ListItem>
+							<ListItem itemHeader first style={{ paddingBottom: 3 }}>
+								<Text>SETTING</Text>
+							</ListItem>
+							<ListItem button noBorder onPress={() => 	this.props.navigation.navigate('Config') }>
+								<Left>
+									<Icon active name='settings' style={{ color: "#777", fontSize: 26, width: 30 }} />
+									<Text style={styles.text}>
+										Configuration
 									</Text>
 								</Left>
 							</ListItem>
