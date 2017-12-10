@@ -5,7 +5,7 @@
  */
 
 import React, { Component } from 'react';
-import { StyleSheet, BackHandler, View, TouchableOpacity, Platform, Image, ScrollView, Dimensions, AsyncStorage } from 'react-native';
+import { StyleSheet, BackHandler, View, ActivityIndicator, TouchableOpacity, Platform, Image, ScrollView, Dimensions, AsyncStorage } from 'react-native';
 import GridView from 'react-native-super-grid';
 import { Container, Spinner, Header, Content, Card, CardItem, Root, ActionSheet, Text, SwipeRow, Body, Left, Button, Label, Icon, Title, Right, Item, Switch, Input, List, ListItem, Separator  } from 'native-base';
 import Modal from 'react-native-modal';
@@ -46,6 +46,7 @@ export default class Product extends Component<{}> {
                 name: 'ALL',
                 index: 0
             },
+            pay_loading: false,
             choosed_menu: {
                 price: '0',
                 product_name: '',
@@ -443,6 +444,9 @@ export default class Product extends Component<{}> {
                 {
                     this.state.draft_order.length>0&&<View style={{ flexDirection: 'row', marginTop: 20 }}>
                         <Button success onPress={() => {
+                            this.setState({
+                                pay_loading: true
+                            })
                             fetch(`${this.state.pos_host}/api/sell/add_order`, {
                 				method: 'POST',
                 				body: JSON.stringify({
@@ -460,11 +464,17 @@ export default class Product extends Component<{}> {
                 			.then((response) => {
                                 this.setState({
                                     draft_order: [],
-                                    billModal: false
+                                    billModal: false,
+                                    pay_loading: false
                                 })
                             })
                         }}>
-                            <Icon name='md-card' />
+                            {
+                                this.state.pay_loading?
+                                <ActivityIndicator size='large' style={{ paddingLeft: 10 }}/>
+                                :
+                                <Icon name='md-card' />
+                            }
                             <Text>สร้างใบสั่ง</Text>
                         </Button>
                     </View>
@@ -472,6 +482,9 @@ export default class Product extends Component<{}> {
                 {
                     this.state.draft_order.length==0&&<View style={{ flexDirection: 'row', marginTop: 20 }}>
                         <Button success onPress={() => {
+                            this.setState({
+                                pay_loading: true
+                            })
                             fetch(`${this.state.pos_host}/api/sell/checkout`, {
                 				method: 'POST',
                 				body: JSON.stringify({
@@ -491,7 +504,13 @@ export default class Product extends Component<{}> {
                                 this.props.navigation.dispatch(resetAction)
                             })
                         }}>
-                            <Icon name='md-card' />
+
+                            {
+                                this.state.pay_loading?
+                                <ActivityIndicator size='large' style={{ paddingLeft: 10 }}/>
+                                :
+                                <Icon name='md-card' />
+                            }
                             <Text>ชำระเงิน</Text>
                         </Button>
                     </View>

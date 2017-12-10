@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Dimensions, Platform, Image, TextInput, TouchableOpacity, KeyboardAvoidingView, AsyncStorage } from 'react-native';
+import { StyleSheet, Dimensions, Platform, Image, TextInput, TouchableOpacity, KeyboardAvoidingView, AsyncStorage, ActivityIndicator } from 'react-native';
 import Drawer from 'react-native-drawer'
 import {
 	Content,
@@ -51,7 +51,8 @@ export default class Login extends React.Component {
             shadowRadius: 4,
 			isReady: false,
 			page: 'Login',
-			error: ""
+			error: "",
+			loading: false
         }
 		this.openControlPanel = this.openControlPanel.bind(this)
 		this.onLogin = this.onLogin.bind(this)
@@ -74,7 +75,7 @@ export default class Login extends React.Component {
 
 		const token = await AsyncStorage.getItem('token')
 		if(token) {
-			
+
 		} else {
 			await AsyncStorage.setItem('current_state', 'Login')
 		}
@@ -86,12 +87,18 @@ export default class Login extends React.Component {
 
 	async onLogin() {
 		if(this.state.username && this.state.password) {
+			this.setState({
+				loading: true
+			})
 			axios.get(this.state.default_host + '/api/user/login?username=' + this.state.username + '&password='+ this.state.password)
 			.then((response) => {
 				if(response.data.success == "1") {
 					this.setState({ error: "" })
 					AsyncStorage.setItem('token',  response.data.token)
 					.then(() => {
+						this.setState({
+							loading: false
+						})
 						AsyncStorage.setItem('password', this.state.password).then(() => {
 							AsyncStorage.setItem('app_list', JSON.stringify(response.data.app_list)).then(() => {
 								const resetAction = NavigationActions.reset({
@@ -106,10 +113,16 @@ export default class Login extends React.Component {
 					})
 				} else {
 					this.setState({ error: response.data.error, password: ""})
+					this.setState({
+						loading: false
+					})
 				}
 			})
 		} else {
 			this.setState({ error: 'กรุณาระบุ Username เเละ Password' })
+			this.setState({
+				loading: false
+			})
 		}
 	}
 
@@ -196,12 +209,16 @@ export default class Login extends React.Component {
                         		<Button block style={{ marginRight: 15, marginLeft: 15, marginTop: 15, backgroundColor: '#8b9dc3' }}
 									onPress={() =>  this.onLogin()}
 								>
+									{
+										this.state.loading&&<ActivityIndicator size='large' />
+									}
                         			<Text>Log In</Text>
                         		</Button>
 								{
 									!!this.state.error&&<Text style={{ textAlign: 'center', color: 'white', marginTop: 10 }}>{ this.state.error }</Text>
 								}
                         </View>
+
 					</Container>
 					:
 					<Container />
@@ -291,5 +308,14 @@ const styles = StyleSheet.create({
 		backgroundColor: '#11B8FF',
 		justifyContent: "center",
 		alignItems: "center"
-	}
+	},
+	loading: {
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		top: 0,
+		bottom: 0,
+		alignItems: 'center',
+		justifyContent: 'center'
+ 	}
 });
