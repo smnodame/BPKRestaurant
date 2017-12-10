@@ -31,11 +31,18 @@ import {
 	CardItem,
 	Toast,
 	Fab,
-	Spinner
+	Spinner,
+	Root,
+	ActionSheet
 } from "native-base";
 import { NavigationActions } from 'react-navigation'
 const deviceHeight = Dimensions.get("window").height
 const deviceWidth = Dimensions.get("window").width
+
+
+// { text: "ซุป", icon: "md-arrow-dropright", iconColor: "#ea943b" },
+var DESTRUCTIVE_INDEX = 3;
+var CANCEL_INDEX = 4;
 
 export default class Patient extends React.Component {
     constructor(props) {
@@ -58,7 +65,8 @@ export default class Patient extends React.Component {
 			loading: true,
 			page: 1,
 			show_load_more: false,
-			isLoading: false
+			isLoading: false,
+			category: 'ประเภทผู้ป่วย'
         }
 		this.openControlPanel = this.openControlPanel.bind(this)
 		this.logout = this.logout.bind(this)
@@ -269,14 +277,42 @@ export default class Patient extends React.Component {
 		}
 	}
 
-    render() {
+	showCategoty = () => {
 		const data = [
-            { key: 2, label: 'None' },
-            { key: 3, label: 'OPD' },
-            { key: 4, label: 'IPD' }
-        ];
+			{ text: "ประเภทผู้ป่วย", icon: "md-arrow-dropright", iconColor: "#ea943b"},
+			{ text: "OPD", icon: "md-arrow-dropright", iconColor: "#ea943b"},
+			{ text: "IPD", icon: "md-arrow-dropright", iconColor: "#ea943b"}
+		]
+
+        if ( this.actionSheet !== null ) {
+            this.actionSheet._root.showActionSheet(
+                {
+                    options: data,
+                    cancelButtonIndex: CANCEL_INDEX,
+                    destructiveButtonIndex: DESTRUCTIVE_INDEX,
+                    title: "เลือกประเภทผู้ป่วย"
+                },
+                buttonIndex => {
+					if(buttonIndex>=1 && buttonIndex<=2) {
+						this.setState({
+							visit_type: data[buttonIndex].text,
+
+						})
+					}
+					if(buttonIndex>=0 && buttonIndex<=2) {
+						this.setState({
+							category: data[buttonIndex].text,
+						})
+					}
+				}
+            )
+        }
+    }
+
+    render() {
 
     return (
+		<Root>
 	    <Drawer
 	        ref={(ref) => this._drawer = ref}
 	        type="overlay"
@@ -295,6 +331,7 @@ export default class Patient extends React.Component {
 	                    <View style={styles.drawerCover}>
                         	<Image square style={styles.drawerImage} source={  require('../../Images/patient.png') } />
 	                    </View>
+
 						<List>
 							<ListItem itemHeader first style={{ paddingBottom: 3 }}>
 								<Text>ACTIVITIES</Text>
@@ -427,14 +464,14 @@ export default class Patient extends React.Component {
 													<Text style={{ flex: 1}}>ประกอบด้วย</Text>
 													<Switch value={this.state.search_contain} onValueChange={(search_contain) => this.setState({search_contain})}/>
 												</View>
-
-
-
-														<TextInput placeholderTextColor='#d4d8da' placeholder='ประเภทผู้ป่วย'
-															style={[styles.textInput, { backgroundColor: 'white', marginBottom: 10 } ]}
-															editable={false}
-															value={this.state.visit_type}
-														/>
+												<ActionSheet ref={(c) => { this.actionSheet = c }} />
+												<Button
+													bordered block
+													onPress={() => this.showCategoty() }
+													style={[styles.textInput, { backgroundColor: 'white', marginBottom: 10 }]}
+												>
+													<Text style={{ color: 'black' }}>{ this.state.category }</Text>
+												</Button>
 
 												<View style={{ flex: 1, flexDirection: 'row' }}>
 													<View style={{ flex: 1 }} />
@@ -467,6 +504,7 @@ export default class Patient extends React.Component {
 					<Container />
 			}
 			</Drawer>
+			</Root>
     );
   }
 }
