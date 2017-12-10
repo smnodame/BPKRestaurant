@@ -19,7 +19,7 @@ import Splash from './screens/splash'
 import ChooseProgram from './screens/programs'
 import Patient from './screens/patient'
 import Personal from './screens/personal'
-
+import Barcode from './screens/barcode' 
 import Config from './screens/config'
 
 const BPKRestaurant = StackNavigator({
@@ -32,7 +32,8 @@ const BPKRestaurant = StackNavigator({
     ChooseProgram: { screen: ChooseProgram },
     Config: { screen: Config },
     Patient: { screen: Patient },
-    Personal: { screen: Personal }
+    Personal: { screen: Personal },
+    Barcode: { screen: Barcode }
 },
 {
     initialRouteName: "Splash",
