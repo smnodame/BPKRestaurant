@@ -61,7 +61,8 @@ export default class Product extends Component<{}> {
             isShowLoadMore: false,
             isLoading: true,
             isLoadMoreProcess: false,
-            isReady: false
+            isReady: false,
+            pending_order_loading: true
         }
         this.renderModalContent = this.renderModalContent.bind(this)
         this.renderBillModal = this.renderBillModal.bind(this)
@@ -310,52 +311,65 @@ export default class Product extends Component<{}> {
                 </View>
                 <View style={{ width: '100%' }}>
                     <ScrollView style={{ height: this.state.billHeight }}>
-                    <List>
-                        {
-                            this.state.pending_sale_products.map((pending_sale_product, index) => {
-                                return (
-                                    <SwipeRow
-                                        key={pending_sale_product.pending_sale_product_id}
-                                        rightOpenValue={-75}
-                                        body={
-                                            <View style={{ flexDirection: 'row' }}>
-                                                <View style={{ width: '70%', marginLeft: 10 }}>
-                                                    <Text style={{ textAlign: 'left', width: '100%' }} numberOfLines={1}>{ pending_sale_product.product_detail }</Text>
-                                                    <Text style={{ textAlign: 'left', width: '100%' }} note numberOfLines={1}>{ 'x ' + parseInt(pending_sale_product.qty, 10).toString() + ' ' + pending_sale_product.unit_detail }</Text>
+                    {
+                        this.state.pending_order_loading?
+                        <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                            <Spinner color='red' />
+                            <Text style={{ textAlign: 'center', color: '#d4d8da', marginTop: 5, fontSize: 20 }}>Loading...</Text>
+                        </View>
+                        :
+                        <List>
+                            {
+                                this.state.pending_sale_products.map((pending_sale_product, index) => {
+                                    return (
+                                        <SwipeRow
+                                            key={pending_sale_product.pending_sale_product_id}
+                                            rightOpenValue={-75}
+                                            body={
+                                                <View style={{ flexDirection: 'row' }}>
+                                                    <View style={{ width: '70%', marginLeft: 10 }}>
+                                                        <Text style={{ textAlign: 'left', width: '100%' }} numberOfLines={1}>{ pending_sale_product.product_detail }</Text>
+                                                        <Text style={{ textAlign: 'left', width: '100%' }} note numberOfLines={1}>{ 'x ' + parseInt(pending_sale_product.qty, 10).toString() + ' ' + pending_sale_product.unit_detail }</Text>
+                                                    </View>
+                                                    <View style={{ flex: 1 }}>
+                                                        <Text style={{ fontSize: 18, color: '#5cb85c', textAlign: 'right', width: '100%' }}>
+                                                            { pending_sale_product.total_price + ' ฿'}
+                                                        </Text>
+                                                    </View>
                                                 </View>
-                                                <View style={{ flex: 1 }}>
-                                                    <Text style={{ fontSize: 18, color: '#5cb85c', textAlign: 'right', width: '100%' }}>
-                                                        { pending_sale_product.total_price + ' ฿'}
-                                                    </Text>
-                                                </View>
-                                            </View>
-                                        }
-                                        right={
-                                            <Button danger onPress={() => {
-                                                fetch(`${this.state.pos_host}/api/sell/cancel_order`, {
-                                    				method: 'POST',
-                                    				body: JSON.stringify({
-                                    					token: this.state.token,
-                                                        pending_sale_product_id: pending_sale_product.pending_sale_product_id,
-                                    				})
-                                    			})
-                                    			.then((res) => res.json())
-                                    			.then((response) => {
-                                                    this.setState({
-                                                        pending_sale_products: this.state.pending_sale_products.filter((pending_sale_product, index_2) => {
-                                                            return index_2 != index
+                                            }
+                                            right={
+                                                <Button danger onPress={() => {
+                                                    fetch(`${this.state.pos_host}/api/sell/cancel_order`, {
+                                        				method: 'POST',
+                                        				body: JSON.stringify({
+                                        					token: this.state.token,
+                                                            pending_sale_product_id: pending_sale_product.pending_sale_product_id,
+                                        				})
+                                        			})
+                                        			.then((res) => res.json())
+                                        			.then((response) => {
+                                                        this.setState({
+                                                            pending_sale_products: this.state.pending_sale_products.filter((pending_sale_product, index_2) => {
+                                                                return index_2 != index
+                                                            })
                                                         })
                                                     })
-                                                })
-                                            }}>
-                                                <Icon active name="trash" />
-                                            </Button>
-                                        }
-                                    />
-                                )
-                            })
-                        }
-                    </List>
+                                                }}>
+                                                    <Icon active name="trash" />
+                                                </Button>
+                                            }
+                                        />
+                                    )
+                                })
+                            }
+                        </List>
+                    }
+                    {
+                        !this.state.pending_order_loading&&this.state.pending_sale_products.length == 0&&<View>
+                            <Text style={{ textAlign: 'center', color: '#d4d8da', marginTop: 20, fontSize: 20 }}>ไม่พบข้อมูล</Text>
+                        </View>
+                    }
                     </ScrollView>
                 </View>
             </View>
@@ -730,13 +744,24 @@ export default class Product extends Component<{}> {
                             <Body>
                                 <Button transparent light
                                     onPress={() => {
+                                            this.setState({
+                                                orderModal: true,
+                                                pending_order_loading: true,
+                                                pending_sale_products: []
+                                            })
                                             fetch(`${this.state.pos_host}/api/sell/pos_table_product_list?token=${this.state.token}&section_pos_id=${this.state.section_pos_id}&pos_table_id=${this.state.pos_table_id}`)
                                             .then((res) => res.json())
                                             .then((response) => {
-                                                console.log(response)
                                                 this.setState({
-                                                    pending_sale_products: response.data.products,
-                                                    orderModal: true
+                                                    pending_order_loading: false,
+                                                    pending_sale_products: response.data.products
+                                                })
+                                            }, (err) => {
+
+                                            }).catch(() => {
+                                                this.setState({
+                                                    pending_order_loading: false,
+                                                    pending_sale_products: []
                                                 })
                                             })
                                         }
