@@ -377,14 +377,16 @@ export default class Patient extends React.Component {
 									}
 
 								</Content>
-								<Fab
-									active={true}
-									direction="up"
-									onPress={() => this.getQueue() }
-									style={{ backgroundColor: '#FE6449' }}
-									position="bottomRight">
-										<Icon name="refresh"/>
-								</Fab>
+								{
+                                    !this.state.loading&&<Fab
+    									active={true}
+    									direction="up"
+    									onPress={() => this.getQueue() }
+    									style={{ backgroundColor: '#FE6449' }}
+    									position="bottomRight">
+    										<Icon name="refresh"/>
+    								</Fab>
+                                }
                         	</Tab>
                         	<Tab heading={ <TabHeading style={{ backgroundColor: '#FE6449' }} ><Icon name="search" /><Text>ค้นหาผู้ป่วย</Text></TabHeading>} >
                         		<Content style={{ backgroundColor: '#f4f4f4' }}>
@@ -427,7 +429,7 @@ export default class Patient extends React.Component {
 												</View>
 
 
-												
+
 														<TextInput placeholderTextColor='#d4d8da' placeholder='ประเภทผู้ป่วย'
 															style={[styles.textInput, { backgroundColor: 'white', marginBottom: 10 } ]}
 															editable={false}
