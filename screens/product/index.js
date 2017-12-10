@@ -237,8 +237,9 @@ export default class Product extends Component<{}> {
 
     goToTablePage = () => {
         const resetAction = NavigationActions.reset({
-        	index: 0,
+        	index: 1,
         	actions: [
+                NavigationActions.navigate({ routeName: 'Restaurant'}),
         		NavigationActions.navigate({ routeName: 'Table'})
         	]
         })
