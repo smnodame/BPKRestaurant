@@ -46,6 +46,7 @@ export default class Product extends Component<{}> {
                 name: 'ALL',
                 index: 0
             },
+            delete_loading: false,
             pay_loading: false,
             choosed_menu: {
                 price: '0',
@@ -341,7 +342,12 @@ export default class Product extends Component<{}> {
                                                 </View>
                                             }
                                             right={
-                                                <Button danger onPress={() => {
+                                                <Button
+                                                disable={this.state.pay_loading}
+                                                danger onPress={() => {
+                                                    this.setState({
+                                                        pay_loading: true
+                                                    })
                                                     fetch(`${this.state.pos_host}/api/sell/cancel_order`, {
                                         				method: 'POST',
                                         				body: JSON.stringify({
@@ -354,11 +360,17 @@ export default class Product extends Component<{}> {
                                                         this.setState({
                                                             pending_sale_products: this.state.pending_sale_products.filter((pending_sale_product, index_2) => {
                                                                 return index_2 != index
-                                                            })
+                                                            }),
+                                                            pay_loading: false
                                                         })
                                                     })
                                                 }}>
-                                                    <Icon active name="trash" />
+                                                    {
+                                                        this.state.pay_loading?
+                                                        <ActivityIndicator size='large' style={{ paddingLeft: 10 }}/>
+                                                        :
+                                                        <Icon active name="trash" />
+                                                    }
                                                 </Button>
                                             }
                                         />
@@ -443,10 +455,13 @@ export default class Product extends Component<{}> {
                 }
                 {
                     this.state.draft_order.length>0&&<View style={{ flexDirection: 'row', marginTop: 20 }}>
-                        <Button success onPress={() => {
+                        <Button
+                        disable={this.state.pay_loading}
+                        success onPress={() => {
                             this.setState({
                                 pay_loading: true
                             })
+
                             fetch(`${this.state.pos_host}/api/sell/add_order`, {
                 				method: 'POST',
                 				body: JSON.stringify({
@@ -481,7 +496,9 @@ export default class Product extends Component<{}> {
                 }
                 {
                     this.state.draft_order.length==0&&<View style={{ flexDirection: 'row', marginTop: 20 }}>
-                        <Button success onPress={() => {
+                        <Button
+                        disable={this.state.pay_loading}
+                        success onPress={() => {
                             this.setState({
                                 pay_loading: true
                             })
@@ -943,4 +960,13 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(0, 0, 0, 0.1)',
     },
     icon: {fontSize: 40, color: '#5cb85c'},
+    loading: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center'
+    }
 });
