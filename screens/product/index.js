@@ -539,13 +539,13 @@ export default class Product extends Component<{}> {
     renderModalContent = () => (
         <View style={styles.modalContent}>
             <View style={{ flexDirection: 'row', marginBottom: 20, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ width: '60%' }}>
+            <Text style={{ width: '50%' }}>
                 {
                     this.state.choosed_menu.product_name
                 }
             </Text>
             <View style={{ flex: 1 }}/>
-            <Item regular style={[styles.textInput, { backgroundColor: 'white', width: 70 } ]}>
+            <Item regular style={[styles.textInput, { backgroundColor: 'white', width: 90 } ]}>
                 <Input
                     placeholderTextColor='#d4d8da'
                     editable = {this.state.choosed_menu.editable_sale_price}
@@ -610,8 +610,7 @@ export default class Product extends Component<{}> {
                                 this.setState({
                                     choosed_menu: {
                                         ...this.state.choosed_menu,
-                                        amount: (parseInt(this.state.choosed_menu.amount, 10) - 1).toString(),
-                                        sumPrice: this.state.choosed_menu.price
+                                        amount: (parseInt(this.state.choosed_menu.amount, 10) - 1).toString()
                                     }
                                 })
                             }
@@ -637,8 +636,7 @@ export default class Product extends Component<{}> {
                         this.setState({
                             choosed_menu: {
                                 ...this.state.choosed_menu,
-                                amount: (parseInt(this.state.choosed_menu.amount, 10) + 1).toString(),
-                                sumPrice: this.state.choosed_menu.price
+                                amount: (parseInt(this.state.choosed_menu.amount, 10) + 1).toString()
                             }
                         })
                     }
