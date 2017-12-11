@@ -308,7 +308,10 @@ export default class Product extends Component<{}> {
                         <View style={{ flex: 1 }} />
                     <Button transparent
                     style={{ paddingBottom: 20 }}
-                    onPress={() => this.setState({ orderModal: false })}>
+                    onPress={() => {
+                        this.setState({ pending_sale_products: [] })
+                        this.setState({ orderModal: false })
+                    }}>
                         <Icon name='md-close' />
                     </Button>
                 </View>
@@ -821,6 +824,7 @@ export default class Product extends Component<{}> {
                                 })
                             })
                         }}
+                        animationOutTiming={10}
                         isVisible={this.state.orderModal}>{this.renderOrderModal()}</Modal>
                         <Modal isVisible={this.state.dialogVisible}
                         onRequestClose={() => this.setState({dialogVisible: false})}
