@@ -333,7 +333,7 @@ export default class Product extends Component<{}> {
                                             rightOpenValue={-75}
                                             body={
                                                 <View style={{ flexDirection: 'row' }}>
-                                                    <View style={{ width: '70%', marginLeft: 10 }}>
+                                                    <View style={{ width: '60%', marginLeft: 10 }}>
                                                         <Text style={{ textAlign: 'left', width: '100%' }} numberOfLines={1}>{ pending_sale_product.product_detail }</Text>
                                                         <Text style={{ textAlign: 'left', width: '100%' }} note numberOfLines={1}>{ 'x ' + parseInt(pending_sale_product.qty, 10).toString() + ' ' + pending_sale_product.unit_detail }</Text>
                                                     </View>
@@ -432,7 +432,7 @@ export default class Product extends Component<{}> {
                                                     </View>
                                                     <View style={{ flex: 1 }}>
                                                         <Text style={{ fontSize: 18, color: '#5cb85c', textAlign: 'right', width: '100%' }}>
-                                                            { (parseInt(draft_order.price, 0) * parseInt(draft_order.qty, 10)).toString() + ' ฿'}
+                                                            { (parseFloat(draft_order.price) * parseFloat(draft_order.qty)).toString() + ' ฿'}
                                                         </Text>
                                                     </View>
                                                 </View>
@@ -550,18 +550,40 @@ export default class Product extends Component<{}> {
             <View style={{ flex: 1 }}/>
             <Item regular style={[styles.textInput, { backgroundColor: 'white', width: 90 } ]}>
                 <Input
+                    keyboardType='numeric'
                     placeholderTextColor='#d4d8da'
                     editable = {this.state.choosed_menu.editable_sale_price}
                     placeholder='ราคา'
                     value={this.state.choosed_menu.sumPrice}
                     style={{ textAlign: 'center', fontSize: 18, color: '#5cb85c' }}
                     onChangeText={
-                        (text) => this.setState({
-                            choosed_menu: {
-                                ...this.state.choosed_menu,
-                                sumPrice: text
+                        (text) => {
+
+                            if(!!text.match(/^\d+(?:\.\d+)?$/)) {
+                                this.setState({
+                                    choosed_menu: {
+                                        ...this.state.choosed_menu,
+                                        sumPrice: text
+                                    }
+                                })
                             }
-                        })
+                            if(!!text.match(/^\d+(?:\.)?$/)) {
+                                this.setState({
+                                    choosed_menu: {
+                                        ...this.state.choosed_menu,
+                                        sumPrice: text
+                                    }
+                                })
+                            }
+                            if(!text) {
+                                this.setState({
+                                    choosed_menu: {
+                                        ...this.state.choosed_menu,
+                                        sumPrice: text
+                                    }
+                                })
+                            }
+                        }
                     }
                 />
             </Item>
@@ -652,9 +674,15 @@ export default class Product extends Component<{}> {
                     this.state.choosed_menu.unit
                 }
             </Text>
-            <Button block success onPress={() => this.addOrderToDraft() }>
-                <Text>ยืนยัน</Text>
-            </Button>
+            <View style={{ flexDirection: 'row', flex: 1,  marginBottom: 35 }}>
+                <Button block style={{ width: '100%', flex: 1, marginRight: 10}} success onPress={() => this.addOrderToDraft() }>
+                    <Text>ยืนยัน</Text>
+                </Button>
+                <Button danger width={50} onPress={() => this.setState({ dialogVisible: false }) }>
+                    <Text>ปิด</Text>
+                </Button>
+            </View>
+
         </View>
     )
 
